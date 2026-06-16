@@ -1,4 +1,4 @@
-/* Giao diện chung & Hình nền Ubuntu đặc trưng */
+/* Giao diện chung & Hình nền Ubuntu */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -15,11 +15,12 @@ body {
     overflow: hidden;
 }
 
-/* Top Bar */
+/* Top Bar mờ kính */
 .top-bar {
     height: 28px;
-    background: rgba(16, 16, 16, 0.75);
-    backdrop-filter: blur(10px);
+    background: rgba(16, 16, 16, 0.65);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     color: #dfdbd2;
     display: flex;
     justify-content: space-between;
@@ -29,182 +30,149 @@ body {
     font-weight: 500;
     z-index: 9999;
     position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-.top-bar .right i {
-    margin-left: 12px;
-    cursor: pointer;
-}
+.top-bar .right i { margin-left: 14px; cursor: pointer; }
 
 /* Ubuntu Left Dock */
 .side-dock {
     position: absolute;
-    left: 4px;
-    top: 35px;
-    bottom: 4px;
-    width: 55px;
-    background: rgba(16, 16, 16, 0.4);
-    backdrop-filter: blur(12px);
-    border-radius: 8px;
+    left: 6px;
+    top: 36px;
+    bottom: 6px;
+    width: 58px;
+    background: rgba(16, 16, 16, 0.45);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 10px;
+    padding-top: 12px;
     z-index: 999;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
 .dock-item {
-    width: 42px;
-    height: 42px;
-    margin-bottom: 10px;
-    border-radius: 6px;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 12px;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 22px;
-    color: #fff;
+    color: #ffffff;
     cursor: pointer;
     position: relative;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
 }
 
-.dock-item:hover {
-    transform: scale(1.15);
-    background: rgba(233, 84, 32, 0.3);
+/* Fix lỗi hiển thị icon đầy đủ */
+.dock-item i {
+    display: inline-block;
 }
 
-/* Hiệu ứng Tooltip khi di chuột vào Dock */
+.dock-item:hover {
+    transform: scale(1.18);
+    background: rgba(233, 84, 32, 0.4);
+}
+
+/* Tooltip trên Dock */
 .dock-item .tooltip {
     position: absolute;
-    left: 65px;
-    background: rgba(0,0,0,0.8);
-    padding: 4px 8px;
-    border-radius: 4px;
+    left: 68px;
+    background: rgba(10, 10, 10, 0.9);
+    padding: 5px 10px;
+    border-radius: 5px;
     font-size: 11px;
     visibility: hidden;
     opacity: 0;
-    transition: 0.2s;
+    transition: opacity 0.15s;
     white-space: nowrap;
+    border: 1px solid rgba(255,255,255,0.1);
 }
-.dock-item:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
-}
+.dock-item:hover .tooltip { visibility: visible; opacity: 1; }
+.settings-icon { margin-top: auto; margin-bottom: 15px; }
 
-/* Sắp xếp nút Settings xuống đáy dock */
-.settings-icon {
-    margin-top: auto;
-    margin-bottom: 15px;
-}
+/* Desktop */
+.desktop { position: absolute; top: 28px; left: 70px; right: 0; bottom: 0; }
 
-/* Không gian Desktop làm việc */
-.desktop {
-    position: absolute;
-    top: 28px;
-    left: 65px;
-    right: 0;
-    bottom: 0;
-}
-
-/* Cửa sổ ứng dụng kiểu Linux Gtk */
+/* Cửa sổ ứng dụng */
 .window {
     position: absolute;
-    width: 500px;
-    height: 320px;
-    background: rgba(30, 30, 30, 0.85);
-    backdrop-filter: blur(20px);
+    background: rgba(35, 35, 35, 0.88);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     z-index: 10;
-    /* Hiệu ứng mượt mà khi mở cửa sổ */
-    animation: zoomIn 0.25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: zoomIn 0.22s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-/* CSS Animation khi mở */
 @keyframes zoomIn {
-    from { transform: scale(0.8); opacity: 0; }
+    from { transform: scale(0.85); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+.window.closing { animation: zoomOut 0.18s ease-in forwards; }
+@keyframes zoomOut { to { transform: scale(0.88); opacity: 0; } }
+.hidden { display: none !important; }
 
-/* Hiệu ứng biến mất khi đóng */
-.window.closing {
-    animation: zoomOut 0.2s ease-in forwards;
-}
-@keyframes zoomOut {
-    to { transform: scale(0.85); opacity: 0; }
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Thanh tiêu đề cửa sổ (Header) */
+/* Tiêu đề thanh cửa sổ */
 .window-header {
-    height: 34px;
-    background: #2D2D2D;
+    height: 36px;
+    background: #232323;
     display: flex;
     align-items: center;
-    padding: 0 12px;
+    padding: 0 14px;
     cursor: move;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
 }
-
-.window-dots {
-    display: flex;
-    gap: 7px;
-}
-
-.dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    cursor: pointer;
-}
+.window-dots { display: flex; gap: 8px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
 .dot.close { background: #EF4444; }
 .dot.minimize { background: #F59E0B; }
 .dot.maximize { background: #10B981; }
+.window-title { color: #e6e6e6; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; }
+.window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
-.window-title {
-    color: #dfdbd2;
-    font-size: 13px;
-    text-align: center;
-    flex-grow: 1;
-    margin-right: 45px; /* Để bù trừ khoảng cách cân bằng */
-}
+/* CSS App 1: Terminal */
+.terminal-body { background: #1C131A; padding: 12px; font-family: 'Courier New', monospace; overflow-y: auto;}
+.terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.4; }
+.terminal-input-line { display: flex; align-items: center; color: #dfdbd2; font-size: 13px;}
+.terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: monospace; font-size: 13px; flex-grow: 1; }
 
-/* Phần ruột cửa sổ */
-.window-body {
-    flex-grow: 1;
-    padding: 12px;
-    color: #fff;
-    font-size: 14px;
-}
+/* CSS App 3: Files Manager */
+.files-body { display: flex; padding: 0 !important; background: #2F2F2F; }
+.files-sidebar { width: 130px; background: #3A3A3A; padding-top: 15px; border-right: 1px solid #222; }
+.files-sidebar div { padding: 10px 15px; font-size: 13px; cursor: pointer; color: #ccc; }
+.files-sidebar div:hover, .files-sidebar div.active { background: #E95420; color: white; }
+.files-sidebar div i { margin-right: 8px; }
+.files-content { flex-grow: 1; padding: 15px; display: flex; gap: 20px; flex-wrap: wrap; align-content: flex-start; }
+.file-icon { display: flex; flex-direction: column; align-items: center; width: 65px; cursor: pointer; text-align: center; }
+.file-icon i { font-size: 36px; color: #F59E0B; margin-bottom: 6px; }
+.file-icon i.fa-file-code { color: #60A5FA; }
+.file-icon i.fa-file-alt { color: #9CA3AF; }
+.file-icon span { font-size: 12px; word-break: break-all; color: #e5e7eb; }
 
-/* Giao diện dòng lệnh Linux (Terminal) */
-.terminal-body {
-    background: #1E1E1E;
-    font-family: 'Courier New', Courier, monospace;
-}
+/* CSS App 4: Music Player */
+.music-body { background: #1E1E1E; display: flex; align-items: center; padding: 20px; gap: 20px; }
+.music-body i.fa-music { font-size: 60px; color: #E95420; }
+.music-info h4 { margin-bottom: 4px; color: #fff; font-size: 16px;}
+.music-info p { font-size: 12px; color: #aaa; margin-bottom: 15px;}
+.music-controls { display: flex; gap: 20px; font-size: 20px; cursor: pointer; }
+.music-controls i:hover { color: #E95420; }
+/* Animation đĩa nhạc quay đều */
+.disc-anime { animation: spin 4s linear infinite; animation-play-state: paused; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
-.terminal-text {
-    margin-bottom: 6px;
-    line-height: 1.4;
-}
-
-.terminal-input-line {
-    display: flex;
-    align-items: center;
-}
-
-.terminal-input-line input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #fff;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    flex-grow: 1;
-}
+/* CSS App 5: About Screen */
+.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 10px; background: #2A2A2A;}
+.about-body h3 { color: #E95420; font-size: 18px; margin-top: 5px;}
+.about-body p { font-size: 13px; color: #bbb; }
+.about-body button { margin-top: 10px; background: #E95420; border: none; color: white; padding: 7px 20px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.about-body button:hover { background: #c64113; }
