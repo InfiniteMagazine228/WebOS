@@ -1,4 +1,4 @@
-// 1. Cập nhật đồng hồ hệ thống theo thời gian thực
+// 1. Cập nhật đồng hồ Top Bar theo thời gian thực
 function updateClock() {
     const clockElement = document.getElementById('live-clock');
     const now = new Date();
@@ -7,37 +7,41 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// 2. Logic Mở/Đóng cửa sổ kèm Animation đẹp
+// 2. Mở / Đóng cửa sổ và cơ chế đưa cửa sổ lên trên cùng
+let topZIndex = 100;
+
 function openWindow(id) {
     const win = document.getElementById(id);
     win.classList.remove('hidden', 'closing');
-    // Đưa cửa sổ vừa bấm lên trên cùng (Z-Index)
+    
+    // Tự động căn giữa màn hình ngẫu nhiên một chút khi mở ứng dụng để không đè khít lên nhau
+    if (!win.style.top) {
+        win.style.top = (80 + Math.random() * 50) + "px";
+        win.style.left = (100 + Math.random() * 100) + "px";
+    }
+    
     bringToFront(win);
 }
 
 function closeWindow(id) {
     const win = document.getElementById(id);
     win.classList.add('closing');
-    // Đợi chạy hết animation đóng (0.2s) rồi mới ẩn hẳn
     setTimeout(() => {
         win.classList.add('hidden');
-    }, 200);
+    }, 180);
 }
 
 function bringToFront(clickedWindow) {
-    document.querySelectorAll('.window').forEach(win => {
-        win.style.zindex = "10";
-    });
-    clickedWindow.style.zIndex = "100";
+    topZIndex++;
+    clickedWindow.style.zIndex = topZIndex;
 }
 
-// 3. Xử lý tính năng Kéo - Thả cửa sổ (Drag and Drop)
+// 3. Cơ chế kéo thả các cửa sổ Gtk Linux
 function dragElement(header, event) {
     const targetElement = header.parentElement;
     bringToFront(targetElement);
 
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    
     pos3 = event.clientX;
     pos4 = event.clientY;
     
@@ -50,12 +54,10 @@ function dragElement(header, event) {
         pos3 = e.clientX;
         pos4 = e.clientY;
         
-        // Tính toán vị trí mới
         let newTop = targetElement.offsetTop - pos2;
         let newLeft = targetElement.offsetLeft - pos1;
 
-        // Giới hạn không cho kéo cửa sổ văng ra ngoài thanh Top Bar
-        if(newTop < 28) newTop = 28; 
+        if (newTop < 28) newTop = 28; // Ngăn kéo lọt lên trên Topbar
 
         targetElement.style.top = newTop + "px";
         targetElement.style.left = newLeft + "px";
@@ -67,7 +69,24 @@ function dragElement(header, event) {
     }
 }
 
-// 4. Giả lập lệnh gõ trong Terminal Linux
+// 4. Logic trình nghe nhạc Ubuntu (Music Player)
+const audio = document.getElementById('bg-music');
+const playBtn = document.getElementById('play-btn');
+const disc = document.querySelector('.disc-anime');
+
+function toggleMusic() {
+    if (audio.paused) {
+        audio.play();
+        playBtn.className = "fas fa-pause";
+        disc.style.animationPlayState = "running";
+    } else {
+        audio.pause();
+        playBtn.className = "fas fa-play";
+        disc.style.animationPlayState = "paused";
+    }
+}
+
+// 5. Trình xử lý câu lệnh hệ thống Terminal Linux
 const terminalInput = document.getElementById('terminal-input');
 if(terminalInput) {
     terminalInput.addEventListener('keydown', function(e) {
@@ -75,32 +94,31 @@ if(terminalInput) {
             const command = this.value.trim().toLowerCase();
             const body = this.parentElement.parentElement;
             
-            // Tạo dòng lịch sử lệnh cũ
             const oldLine = document.createElement('p');
             oldLine.className = 'terminal-text';
             oldLine.innerHTML = `ubuntu@webos:~$ ${this.value}`;
             body.insertBefore(oldLine, this.parentElement);
 
-            // Tạo dòng phản hồi hệ thống (Response)
             const responseLine = document.createElement('p');
             responseLine.className = 'terminal-text';
 
             if (command === 'help') {
-                responseLine.innerHTML = "Available commands: <br>- <span style='color:#8be9fd'>neofetch</span>: Show system details<br>- <span style='color:#8be9fd'>clear</span>: Clear terminal";
+                responseLine.innerHTML = "Lệnh khả dụng: <br>- <span style='color:#50fa7b'>neofetch</span>: Xem cấu hình hệ điều hành<br>- <span style='color:#8be9fd'>ls</span>: Xem các file trong thư mục<br>- <span style='color:#ff79c6'>clear</span>: Xóa màn hình dòng lệnh";
             } else if (command === 'neofetch') {
                 responseLine.innerHTML = `
-                    <span style='color:#ff5555'><b>OS:</b></span> Linux WebOS Ubuntu x86_64<br>
-                    <span style='color:#ff5555'><b>Kernel:</b></span> Javascript Engine v8<br>
-                    <span style='color:#ff5555'><b>Uptime:</b></span> Running on Browser<br>
-                    <span style='color:#ff5555'><b>Shell:</b></span> WebOS-Bash v1.0`;
+                    <span style='color:#e95420'><b>OS:</b></span> Ubuntu WebOS v2.0 Linux<br>
+                    <span style='color:#e95420'><b>Host:</b></span> Vercel Cloud Server<br>
+                    <span style='color:#e95420'><b>Kernel:</b></span> Browser JavaScript Engine<br>
+                    <span style='color:#e95420'><b>DE:</b></span> GNOME Web Shell`;
+            } else if (command === 'ls') {
+                responseLine.innerHTML = "<span style='color:#60A5FA'>Projects/</span> &nbsp;&nbsp; <span style='color:#60A5FA'>Photos/</span> &nbsp;&nbsp; kernel.c &nbsp;&nbsp; README.txt";
             } else if (command === 'clear') {
-                // Xóa toàn bộ text cũ trừ dòng input cuối
                 const textLines = body.querySelectorAll('.terminal-text');
                 textLines.forEach(line => line.remove());
                 this.value = '';
                 return;
             } else if (command !== "") {
-                responseLine.innerHTML = `bash: command not found: ${command}. Type 'help'.`;
+                responseLine.innerHTML = `bash: không tìm thấy lệnh: ${command}. Gõ 'help' để xem danh sách lệnh.`;
                 responseLine.style.color = '#ff5555';
             }
 
@@ -108,9 +126,8 @@ if(terminalInput) {
                 body.insertBefore(responseLine, this.parentElement);
             }
 
-            // Reset và cuộn xuống cuối
             this.value = '';
-            body.scrollTop = body.scrollHeight;
+            body.scrollTop = body.scrollHeight; // Tự động cuộn xuống dưới cùng
         }
     });
 }
