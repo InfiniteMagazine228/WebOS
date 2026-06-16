@@ -1,17 +1,83 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <!-- Biểu tượng icon hiển thị trên tab trình duyệt -->
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Web OS - Hệ Điều Hành Trên Trình Duyệt</title>
-  </head>
-  <body>
-    <!-- React sẽ biến thẻ div này thành toàn bộ giao diện Web OS của bạn -->
-    <div id="root"></div>
-    
-    <!-- Dòng này để kết nối file JavaScript chính của React vào HTML -->
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux WebOS - Ubuntu Clone</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome dùng để lấy các icon -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+</head>
+<body>
+
+    <!-- Thanh trạng thái trên cùng (Top Bar) -->
+    <div class="top-bar">
+        <div class="left">Activities</div>
+        <div class="center" id="live-clock">00:00:00</div>
+        <div class="right">
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-volume-up"></i>
+            <i class="fas fa-battery-three-quarters"></i>
+            <i class="fas fa-power-off"></i>
+        </div>
+    </div>
+
+    <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
+    <div class="side-dock">
+        <div class="dock-item" onclick="openWindow('terminal-window')">
+            <i class="fas fa-terminal"></i>
+            <span class="tooltip">Terminal</span>
+        </div>
+        <div class="dock-item" onclick="openWindow('browser-window')">
+            <i class="fab fa-firefox-browser"></i>
+            <span class="tooltip">Firefox</span>
+        </div>
+        <div class="dock-item settings-icon" onclick="alert('Tính năng đang phát triển!')">
+            <i class="fas fa-cog"></i>
+            <span class="tooltip">Settings</span>
+        </div>
+    </div>
+
+    <!-- Màn hình chính chứa các cửa sổ (Desktop) -->
+    <div class="desktop">
+
+        <!-- CỬA SỔ 1: TERMINAL -->
+        <div id="terminal-window" class="window hidden">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots">
+                    <span class="dot close" onclick="closeWindow('terminal-window')"></span>
+                    <span class="dot minimize" onclick="closeWindow('terminal-window')"></span>
+                    <span class="dot maximize"></span>
+                </div>
+                <div class="window-title">terminal@ubuntu: ~</div>
+            </div>
+            <div class="window-body terminal-body">
+                <p class="terminal-text">Welcome to Linux WebOS v1.0.0!</p>
+                <p class="terminal-text">Type <span style="color: #50fa7b;">'help'</span> or <span style="color: #8be9fd;">'neofetch'</span> to start.</p>
+                <div class="terminal-input-line">
+                    <span>ubuntu@webos:~$ &nbsp;</span>
+                    <input type="text" id="terminal-input" autofocus autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <!-- CỬA SỔ 2: FIREFOX BROWSER -->
+        <div id="browser-window" class="window hidden" style="width: 600px; height: 400px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots">
+                    <span class="dot close" onclick="closeWindow('browser-window')"></span>
+                    <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
+                    <span class="dot maximize"></span>
+                </div>
+                <div class="window-title">Firefox Web Browser</div>
+            </div>
+            <div class="window-body" style="padding: 0;">
+                <iframe src="https://bing.com" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
