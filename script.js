@@ -1,8 +1,8 @@
 // =========================================================================
-// UBUNTU LINUX WEBOS V7.0 - LIVE TERMINAL CONNECTION (GHI ĐÈ TOÀN BỘ FILE)
+// UBUNTU LINUX WEBOS V8.0 - STANDALONE PERFECT SANDBOX (GHI ĐÈ TOÀN BỘ FILE)
 // =========================================================================
 
-// 1. Quản lý hệ thống Đồng hồ Top Bar theo thời gian thực
+// 1. Quản lý đồng hồ hệ thống theo thời gian thực
 function updateClock() {
     const clockElement = document.getElementById('live-clock');
     if (clockElement) {
@@ -72,99 +72,154 @@ function dragElement(header, event) {
     document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
 }
 
-// 5. KẾT NỐI WEBSOCKET ĐẾN MÁY CHỦ LINUX THẬT (LIVE TERMINAL BACKEND)
-const termHistory = document.getElementById('terminal-history');
+// 5. GIẢ LẬP NHÂN LÕI KHO ỨNG DỤNG 'SUDO APT' CHẠY OFFLINE SANDBOX v8.0
+const availablePackages = {
+    'firefox': { name: 'Firefox Browser', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`, windowId: 'firefox-window' },
+    'minecraft': { name: 'Minecraft Eaglercraft 1.8.8', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M9 3v18"></path><path d="M15 3v18"></path><path d="M3 9h18"></path><path d="M3 15h18"></path></svg>`, windowId: 'minecraft-window' }
+};
+const installedPackages = {};
+
 const termInput = document.getElementById('terminal-input');
+const termHistory = document.getElementById('terminal-history');
 
-// Thiết lập đường truyền đến server Node.js chạy cục bộ trên máy Linux của bạn
-// Lưu ý: Nếu mở WebOS từ thiết bị khác trong nhà, hãy thay 'localhost' bằng địa chỉ IP mạng nội bộ của máy Linux (ví dụ: 192.168.1.X)
-const socket = new WebSocket('ws://localhost:8080');
-
-// Xử lý khi kết nối mạng được thiết lập thành công
-socket.onopen = function() {
-    showNotification("Hệ thống lõi", "Đã kết nối thành công với máy chủ Linux thật!");
-    if (termHistory) {
-        termHistory.innerHTML = "<p class='terminal-text' style='color:#50fa7b;'>[Thành công] Đã thông tuyến WebSocket kết nối Kernel Linux thật.</p>";
-    }
-};
-
-// Lắng nghe luồng dữ liệu phản hồi liên tục truyền lên từ máy Linux thật
-socket.onmessage = function(event) {
-    if (termHistory && termInput) {
-        printLinuxStream(event.data);
-        // Tự động cuộn khung màn hình Terminal xuống dưới cùng theo luồng văn bản
-        termInput.parentElement.parentElement.scrollTop = termInput.parentElement.parentElement.scrollHeight;
-    }
-};
-
-// Xử lý khi ngắt kết nối hoặc server backend bị tắt đột ngột
-socket.onclose = function() {
-    showNotification("Cảnh báo", "Mất kết nối tới Backend Terminal!");
-    if (termHistory) {
-        const p = document.createElement('p');
-        p.className = 'terminal-text';
-        p.style.color = '#ff5555';
-        p.innerHTML = "<br>[Lỗi] Mất kết nối tới máy chủ Linux thật. Vui lòng chạy lệnh 'node server.js' trên máy Host.";
-        termHistory.appendChild(p);
-    }
-};
-
-// Bắt sự kiện gõ câu lệnh và truyền tải trực tiếp xuống máy Linux xử lý
-if (termInput) {
+if(termInput) {
     termInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const command = this.value;
+        if(e.key === 'Enter') {
+            const rawInput = this.value.trim();
+            const cmd = rawInput.toLowerCase();
             this.value = '';
 
-            // Kiểm tra và đẩy chuỗi lệnh kèm ký tự xuống dòng (\n) sang WebSocket
-            if (socket.readyState === WebSocket.OPEN) {
-                socket.send(command + '\n');
-            } else {
-                showNotification("Lỗi kết nối", "Không thể gửi lệnh do Socket đã đóng.");
+            if(!rawInput) return;
+
+            // In lại lịch sử dòng lệnh cũ ra màn hình Terminal
+            printText(`ubuntu@webos:~$ ${rawInput}`, "#50fa7b");
+
+            if(cmd === 'clear') {
+                termHistory.innerHTML = '';
+                return;
             }
+            if(cmd === 'neofetch') {
+                printText(`<b>OS:</b> Ubuntu Linux WebOS v6.5 Perfect<br><b>DE:</b> GNOME Web Shell Desktop<br><b>Kernel:</b> Engine Core x86_64<br><b>Shell:</b> Bash v5.2`);
+                return;
+            }
+            if(cmd === 'help') {
+                printText(`Các lệnh khả dụng:<br>- <span style='color:#ff79c6'>sudo apt install firefox</span> : Cài Firefox (Google)<br>- <span style='color:#ff79c6'>sudo apt install minecraft</span> : Cài Minecraft 1.8.8<br>- <span style='color:#ff5555'>sudo apt remove minecraft</span> : Gỡ ứng dụng khỏi hệ thống<br>- <span style='color:#ff79c6'>neofetch</span> : Cấu hình nhân OS<br>- <span style='color:#ff79c6'>clear</span> : Xóa màn hình Terminal`);
+                return;
+            }
+
+            // Lệnh gỡ bỏ gói phần mềm
+            if(cmd.startsWith('sudo apt remove ') || cmd.startsWith('sudo apt-get remove ')) {
+                const parts = cmd.split(' ');
+                const pkg = parts[parts.length - 1];
+
+                if(availablePackages[pkg]) {
+                    if(installedPackages[pkg]) {
+                        printText(`Reading package lists... Done<br>Removing <b>${pkg}</b>... Done`, "#8be9fd");
+                        installedPackages[pkg] = false;
+                        closeWindow(availablePackages[pkg].windowId);
+                        const targetItem = document.getElementById(`dynamic-dock-${pkg}`);
+                        if(targetItem) targetItem.remove();
+
+                        showNotification("APT Manager", `Đã gỡ cài đặt ${availablePackages[pkg].name}!`);
+                        printText(`<span style='color:#ff5555;'>Đã gỡ bỏ ứng dụng ${pkg} khỏi thanh Dock.</span>`);
+                    } else {
+                        printText(`Gói phần mềm ${pkg} chưa được cài đặt.`, "#ffb86c");
+                    }
+                } else {
+                    printText(`E: Không tìm thấy gói phần mềm ${pkg}.`, "#ff5555");
+                }
+                return;
+            }
+
+            // Lệnh cài đặt gói phần mềm
+            if(cmd.startsWith('sudo apt install ') || cmd.startsWith('sudo apt-get install ')) {
+                const parts = cmd.split(' ');
+                const pkg = parts[parts.length - 1];
+
+                if(availablePackages[pkg]) {
+                    if(installedPackages[pkg]) {
+                        printText(`Gói phần mềm ${pkg} đã được cài đặt sẵn.`, "#ffb86c");
+                    } else {
+                        printText(`Reading package lists... Done<br>Installing NEW packages: <b>${pkg}</b>`, "#8be9fd");
+                        
+                        let progress = 0;
+                        printText(`Progress: [..........] 0%`, "#ffb86c", `prog-${pkg}`);
+                        
+                        const interval = setInterval(() => {
+                            progress += 20;
+                            const bar = "█".repeat(progress/10) + "░".repeat((100-progress)/10);
+                            const progLine = document.getElementById(`prog-${pkg}`);
+                            if(progLine) progLine.innerHTML = `Progress: [${bar}] ${progress}%`;
+
+                            if(progress >= 100) {
+                                clearInterval(interval);
+                                executeInstallSuccess(pkg);
+                            }
+                        }, 250);
+                    }
+                } else {
+                    printText(`E: Unable to locate package ${pkg}. <br>Gói ứng dụng có sẵn: firefox, minecraft`, "#ff5555");
+                }
+                return;
+            }
+
+            printText(`bash: command not found: ${rawInput}. Gõ 'help' để xem hướng dẫn.`, "#ff5555");
         }
     });
 }
 
-// Hàm bổ trợ chuyển đổi mã văn bản thô của Linux sang cấu trúc HTML chuẩn hiển thị
-function printLinuxStream(text) {
-    const span = document.createElement('span');
-    span.className = 'terminal-text';
-    
-    // Xử lý chuyển đổi các ký tự xuống dòng đặc trưng của Terminal Linux (\r\n) thành thẻ ngắt dòng <br>
-    let formattedText = text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
-    
-    // Mã hóa thực thể HTML cơ bản để bảo vệ cấu trúc hiển thị văn bản dòng lệnh
-    span.innerHTML = formattedText;
-    termHistory.appendChild(span);
+function printText(text, color = "#fff", id = null) {
+    const p = document.createElement('p');
+    p.className = 'terminal-text';
+    p.style.color = color;
+    p.innerHTML = text;
+    if(id) p.id = id;
+    termHistory.appendChild(p);
+    termInput.parentElement.parentElement.scrollTop = termInput.parentElement.parentElement.scrollHeight;
+}
+
+function executeInstallSuccess(pkgId) {
+    installedPackages[pkgId] = true;
+    const pkgInfo = availablePackages[pkgId];
+
+    printText(`Setting up ${pkgId}...<br><span style='color:#50fa7b;'>Cài đặt thành công! Biểu tượng mới đã xuất hiện trên thanh Dock.</span>`);
+    showNotification("APT Manager", `Đã cài đặt thành công ${pkgInfo.name}!`);
+
+    if(document.getElementById(`dynamic-dock-${pkgId}`)) return;
+
+    const mainDock = document.getElementById('main-dock');
+    const newDockItem = document.createElement('div');
+    newDockItem.className = 'dock-item';
+    newDockItem.id = `dynamic-dock-${pkgId}`;
+    newDockItem.setAttribute('onclick', `openWindow('${pkgInfo.windowId}')`);
+    newDockItem.innerHTML = `
+        ${pkgInfo.icon}
+        <span class="tooltip">${pkgInfo.name}</span>
+    `;
+    mainDock.insertBefore(newDockItem, document.getElementById('dock-about'));
 }
 
 // 6. HỆ THỐNG PHÍM TẮT ĐA NHIỆM THÔNG MINH (NHƯỜNG QUYỀN CHO GAME & TERMINAL)
 window.addEventListener('keydown', function(e) {
-    // Nếu người dùng đang bấm vào trong khung game Minecraft hoặc đang gõ ô lệnh thì bỏ qua phím tắt hệ thống
+    // Nếu người dùng đang bấm vào trong khung game Minecraft hoặc đang gõ ô lệnh thì nhường phím cho game/input
     if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'IFRAME') {
         return; 
     }
 
-    const isModifier = e.altKey || e.metaKey; // Nhận phím Alt hoặc phím Win trên bàn phím
+    const isModifier = e.altKey || e.metaKey; 
 
-    // Phím tắt mở nhanh Terminal: Win + T hoặc Alt + T
     if (isModifier && e.key.toLowerCase() === 't') {
         e.preventDefault();
         openWindow('terminal-window');
-        if (termInput) termInput.focus();
+        document.getElementById('terminal-input').focus();
     }
-    
-    // Phím tắt mở bảng About: Win + X hoặc Alt + X
     if (isModifier && e.key.toLowerCase() === 'x') {
         e.preventDefault();
         openWindow('about-window');
     }
-    
-    // Phím tắt ẩn tất cả cửa sổ (Show Desktop): Win + D hoặc Alt + D
     if (isModifier && e.key.toLowerCase() === 'd') {
         e.preventDefault();
         document.querySelectorAll('.window').forEach(w => w.classList.add('hidden'));
-        showNotification("Desktop Shell", "Đã thu nhỏ toàn bộ ứng dụng.");
+        showNotification("Desktop Shell", "Đã ẩn toàn bộ ứng dụng.");
     }
 });
