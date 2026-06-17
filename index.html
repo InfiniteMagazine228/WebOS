@@ -141,6 +141,27 @@
                 </iframe>
             </div>
         </div>
+        <!-- APP GAME MINECRAFT 1.8.8 (EAGLERCRAFT WASM EDITION) -->
+        <div id="doom-window" class="window hidden" style="width: 800px; height: 520px; top: 50px; left: 140px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots">
+                    <span class="dot close" onclick="closeWindow('doom-window')"></span>
+                    <span class="dot minimize" onclick="closeWindow('doom-window')"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('doom-window')"></span>
+                </div>
+                <div class="window-title">Minecraft Java Edition v1.8.8 (Eaglercraft WASM)</div>
+            </div>
+            <div class="window-body" style="padding:0; background:#000; height: calc(100% - 36px); width: 100%;">
+                <!-- Khử hoàn toàn lỗi Refused kết nối bằng link Client WASM gốc -->
+                <iframe src="https://vse.gq" 
+                        allowfullscreen="true" 
+                        webkitallowfullscreen="true" 
+                        mozallowfullscreen="true" 
+                        msallowfullscreen="true" 
+                        style="width: 100%; height: 100%; border: none; display: block;">
+                </iframe>
+            </div>
+        </div>
 
 
     </div>
