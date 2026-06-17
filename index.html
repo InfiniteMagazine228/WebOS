@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linux WebOS - Ubuntu OS v2.5 Stable</title>
+    <title>Linux WebOS - Ubuntu v3.0 Ultimate</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Thư viện Font Awesome bản mới nhất bảo đảm hiển thị đầy đủ icon -->
+    <!-- Font Awesome v6 mới nhất bảo đảm hiển thị đầy đủ icon trên mọi nền tảng -->
     <link rel="stylesheet" href="https://cloudflare.com">
 </head>
-<body>
+<body id="desktop-body">
 
     <!-- Thanh trạng thái trên cùng (Top Bar) -->
     <div class="top-bar">
@@ -18,11 +18,11 @@
             <i class="fas fa-wifi"></i>
             <i class="fas fa-volume-up"></i>
             <i class="fas fa-battery-full"></i>
-            <i class="fas fa-power-off" onclick="alert('Đang tắt nguồn WebOS...')"></i>
+            <i class="fas fa-power-off" onclick="alert('Hệ thống đang tắt nguồn...')"></i>
         </div>
     </div>
 
-    <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
+    <!-- Thanh ứng dụng bên trái (Ubuntu Dock - Đã fix lỗi tràn) -->
     <div class="side-dock">
         <div class="dock-item" onclick="openWindow('terminal-window')">
             <i class="fas fa-terminal"></i>
@@ -31,6 +31,10 @@
         <div class="dock-item" onclick="openWindow('browser-window')">
             <i class="fab fa-firefox-browser"></i>
             <span class="tooltip">Firefox Browser</span>
+        </div>
+        <div class="dock-item" onclick="openWindow('notepad-window')">
+            <i class="fas fa-edit"></i>
+            <span class="tooltip">Text Editor</span>
         </div>
         <div class="dock-item" onclick="openWindow('files-window')">
             <i class="fas fa-folder-open"></i>
@@ -41,8 +45,8 @@
             <span class="tooltip">Music Player</span>
         </div>
         <div class="dock-item settings-icon" onclick="openWindow('about-window')">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">About System</span>
+            <i class="fas fa-cog"></i>
+            <span class="tooltip">System Settings</span>
         </div>
     </div>
 
@@ -55,12 +59,12 @@
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('terminal-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('terminal-window')"></span>
-                    <span class="dot maximize"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('terminal-window')"></span>
                 </div>
                 <div class="window-title">ubuntu@webos: ~</div>
             </div>
             <div class="window-body terminal-body">
-                <p class="terminal-text">Welcome to Ubuntu WebOS v2.5!</p>
+                <p class="terminal-text">Welcome to Ubuntu WebOS v3.0 Ultimate!</p>
                 <p class="terminal-text">Type <span style="color: #50fa7b;">'help'</span> or <span style="color: #8be9fd;">'neofetch'</span> to interact.</p>
                 <div class="terminal-input-line">
                     <span>ubuntu@webos:~$ &nbsp;</span>
@@ -69,55 +73,86 @@
             </div>
         </div>
 
-        <!-- APP 2: TRÌNH DUYỆT FIREFOX (Nhúng Game từ Itch.io) -->
-<div id="browser-window" class="window hidden" style="width: 750px; height: 500px;">
-    <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-        <div class="window-dots">
-            <span class="dot close" onclick="closeWindow('browser-window')"></span>
-            <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
-            <span class="dot maximize"></span>
+        <!-- APP 2: TRÌNH DUYỆT FIREFOX (Tích hợp bộ chuyển đổi dịch vụ đa năng) -->
+        <div id="browser-window" class="window hidden" style="width: 760px; height: 490px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots">
+                    <span class="dot close" onclick="closeWindow('browser-window')"></span>
+                    <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('browser-window')"></span>
+                </div>
+                <div class="window-title">Firefox Web Browser</div>
+            </div>
+            <!-- Thanh địa chỉ URL giả lập tích hợp các phím tắt đổi trang nhanh -->
+            <div class="browser-nav-bar">
+                <div class="nav-arrows">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-right"></i>
+                    <i class="fas fa-redo"></i>
+                </div>
+                <div class="url-input-box">
+                    <i class="fas fa-lock" style="color: #2ecc71;"></i>
+                    <span id="current-url">https://js.org</span>
+                </div>
+                <div class="quick-bookmarks">
+                    <button onclick="changeWebPage('https://js.org', 'Paint App')">Paint</button>
+                    <button onclick="changeWebPage('https://desmos.com', 'Calculator')">Casio</button>
+                    <button onclick="changeWebPage('https://github.io', 'Sans Boss Fight')">Game Retro</button>
+                </div>
+            </div>
+            <div class="window-body" style="padding: 0; background: #fff; height: calc(100% - 76px);">
+                <iframe id="browser-iframe" src="https://js.org" allowfullscreen="true" style="width:100%; height:100%; border:none; display:block;"></iframe>
+            </div>
         </div>
-        <div class="window-title">Firefox Web Browser (Itch.io Game)</div>
-    </div>
-    <div class="window-body" style="padding: 0; background: #000;">
-        <!-- Nhúng link trực tiếp từ server embed của itch.io để không bị lỗi mặt buồn -->
-        <iframe src="https://itch.io" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
-    </div>
-</div>
 
-        <!-- APP 3: TRÌNH QUẢN LÝ TỆP TIN (Files Manager) -->
+        <!-- APP 3: TEXT EDITOR (Ghi chú văn bản - TÍNH NĂNG MỚI) -->
+        <div id="notepad-window" class="window hidden" style="width: 460px; height: 320px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots">
+                    <span class="dot close" onclick="closeWindow('notepad-window')"></span>
+                    <span class="dot minimize" onclick="closeWindow('notepad-window')"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('notepad-window')"></span>
+                </div>
+                <div class="window-title">Gedit Text Editor</div>
+            </div>
+            <div class="window-body" style="padding: 0;">
+                <textarea class="notepad-textarea" placeholder="Nhập văn bản, ghi chú của bạn tại đây..."></textarea>
+            </div>
+        </div>
+
+        <!-- APP 4: TRÌNH QUẢN LÝ TỆP TIN (Files Manager) -->
         <div id="files-window" class="window hidden" style="width: 520px; height: 360px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('files-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('files-window')"></span>
-                    <span class="dot maximize"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('files-window')"></span>
                 </div>
                 <div class="window-title">Files</div>
             </div>
             <div class="window-body files-body">
                 <div class="files-sidebar">
                     <div class="active"><i class="fas fa-home"></i> Home</div>
-                    <div><i class="fas fa-desktop"></i> Desktop</div>
-                    <div><i class="fas fa-file"></i> Documents</div>
-                    <div><i class="fas fa-download"></i> Downloads</div>
+                    <div onclick="alert('Thư mục trống!')"><i class="fas fa-desktop"></i> Desktop</div>
+                    <div onclick="alert('Thư mục trống!')"><i class="fas fa-file"></i> Documents</div>
+                    <div onclick="alert('Thư mục trống!')"><i class="fas fa-download"></i> Downloads</div>
                 </div>
                 <div class="files-content">
-                    <div class="file-icon" onclick="alert('Thư mục rỗng!')"><i class="fas fa-folder"></i><span>Projects</span></div>
-                    <div class="file-icon" onclick="alert('Thư mục rỗng!')"><i class="fas fa-folder"></i><span>Photos</span></div>
-                    <div class="file-icon" onclick="alert('Mã nguồn nhân hệ thống!')"><i class="fas fa-file-code"></i><span>kernel.c</span></div>
-                    <div class="file-icon" onclick="alert('Dự án mô phỏng hệ điều hành Linux Ubuntu bằng HTML/CSS/JS.')"><i class="fas fa-file-alt"></i><span>README.txt</span></div>
+                    <div class="file-icon" onclick="openWindow('notepad-window')"><i class="fas fa-folder"></i><span>Projects</span></div>
+                    <div class="file-icon" onclick="openWindow('about-window')"><i class="fas fa-folder"></i><span>Photos</span></div>
+                    <div class="file-icon" onclick="alert('Mã nguồn Kernel chính thức!')"><i class="fas fa-file-code"></i><span>kernel.c</span></div>
+                    <div class="file-icon" onclick="alert('Hệ điều hành Ubuntu WebOS chạy trên nền trình duyệt.')"><i class="fas fa-file-alt"></i><span>README.txt</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- APP 4: TRÌNH PHÁT NHẠC (Music Player) -->
+        <!-- APP 5: TRÌNH PHÁT NHẠC (Music Player) -->
         <div id="music-window" class="window hidden" style="width: 400px; height: 220px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('music-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('music-window')"></span>
-                    <span class="dot maximize"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('music-window')"></span>
                 </div>
                 <div class="window-title">Rhythmbox Music Player</div>
             </div>
@@ -132,32 +167,11 @@
                         <i class="fas fa-step-forward"></i>
                     </div>
                 </div>
-                <!-- Nhạc nền phát trực tuyến public công khai -->
                 <audio id="bg-music" src="https://soundhelix.com" loop></audio>
             </div>
         </div>
 
-        <!-- APP 5: THÔNG TIN HỆ THỐNG (About OS) -->
-        <div id="about-window" class="window hidden" style="width: 420px; height: 280px;">
+        <!-- APP 6: SETTINGS & ABOUT HỆ THỐNG (Tích hợp tính năng đổi hình nền) -->
+        <div id="about-window" class="window hidden" style="width: 460px; height: 380px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
-                    <span class="dot close" onclick="closeWindow('about-window')"></span>
-                    <span class="dot minimize" onclick="closeWindow('about-window')"></span>
-                    <span class="dot maximize"></span>
-                </div>
-                <div class="window-title">About Ubuntu WebOS</div>
-            </div>
-            <div class="window-body about-body">
-                <img src="https://wikimedia.org" alt="Ubuntu Logo" width="60">
-                <h3>Ubuntu Linux WebOS</h3>
-                <p>Phiên bản: 2.5.0 Stable (Full Fixed)</p>
-                <p>Công nghệ: HTML5, CSS3, Vanilla JS</p>
-                <button onclick="closeWindow('about-window')">Đóng cài đặt</button>
-            </div>
-        </div>
-
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
