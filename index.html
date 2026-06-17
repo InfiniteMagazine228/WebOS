@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linux WebOS</title>
+    <title>Linux WebOS - Ubuntu OS v2.5 Stable</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Cập nhật link CDN Font Awesome mới nhất không bị lỗi icon -->
+    <!-- Thư viện Font Awesome bản mới nhất bảo đảm hiển thị đầy đủ icon -->
     <link rel="stylesheet" href="https://cloudflare.com">
 </head>
 <body>
 
-    <!-- Thanh trạng thái trên cùng -->
+    <!-- Thanh trạng thái trên cùng (Top Bar) -->
     <div class="top-bar">
         <div class="left">Activities</div>
         <div class="center" id="live-clock">00:00:00</div>
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <!-- Thanh ứng dụng bên trái (Ubuntu Dock đầy đủ App) -->
+    <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
     <div class="side-dock">
         <div class="dock-item" onclick="openWindow('terminal-window')">
             <i class="fas fa-terminal"></i>
@@ -38,7 +38,7 @@
         </div>
         <div class="dock-item" onclick="openWindow('music-window')">
             <i class="fas fa-music"></i>
-            <span class="tooltip">Ubuntu Music Player</span>
+            <span class="tooltip">Music Player</span>
         </div>
         <div class="dock-item settings-icon" onclick="openWindow('about-window')">
             <i class="fas fa-info-circle"></i>
@@ -60,7 +60,7 @@
                 <div class="window-title">ubuntu@webos: ~</div>
             </div>
             <div class="window-body terminal-body">
-                <p class="terminal-text">Welcome to Ubuntu WebOS v2.0!</p>
+                <p class="terminal-text">Welcome to Ubuntu WebOS v2.5!</p>
                 <p class="terminal-text">Type <span style="color: #50fa7b;">'help'</span> or <span style="color: #8be9fd;">'neofetch'</span> to interact.</p>
                 <div class="terminal-input-line">
                     <span>ubuntu@webos:~$ &nbsp;</span>
@@ -69,23 +69,23 @@
             </div>
         </div>
 
-        <!-- APP 2: TRÌNH DUYỆT FIREFOX (Đã fix lỗi iframe bằng link Game Web mở công khai) -->
-        <div id="browser-window" class="window hidden" style="width: 700px; height: 450px;">
+        <!-- APP 2: TRÌNH DUYỆT FIREFOX (Đã sửa lỗi kết nối bằng web vẽ tranh không chặn iframe) -->
+        <div id="browser-window" class="window hidden" style="width: 750px; height: 480px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('browser-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
                     <span class="dot maximize"></span>
                 </div>
-                <div class="window-title">Firefox Web Browser (Retro Game Web)</div>
+                <div class="window-title">Firefox Web Browser (Paint App)</div>
             </div>
             <div class="window-body" style="padding: 0;">
-                <iframe src="https://playcanv.as" style="width:100%; height:100%; border:none; background:#000;"></iframe>
+                <iframe src="https://js.org" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
             </div>
         </div>
 
         <!-- APP 3: TRÌNH QUẢN LÝ TỆP TIN (Files Manager) -->
-        <div id="files-window" class="window hidden" style="width: 500px; height: 350px;">
+        <div id="files-window" class="window hidden" style="width: 520px; height: 360px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('files-window')"></span>
@@ -102,10 +102,10 @@
                     <div><i class="fas fa-download"></i> Downloads</div>
                 </div>
                 <div class="files-content">
-                    <div class="file-icon"><i class="fas fa-folder"></i><span>Projects</span></div>
-                    <div class="file-icon"><i class="fas fa-folder"></i><span>Photos</span></div>
-                    <div class="file-icon" onclick="alert('File cấu hình nhân hệ thống!')"><i class="fas fa-file-code"></i><span>kernel.c</span></div>
-                    <div class="file-icon"><i class="fas fa-file-alt"></i><span>README.txt</span></div>
+                    <div class="file-icon" onclick="alert('Thư mục rỗng!')"><i class="fas fa-folder"></i><span>Projects</span></div>
+                    <div class="file-icon" onclick="alert('Thư mục rỗng!')"><i class="fas fa-folder"></i><span>Photos</span></div>
+                    <div class="file-icon" onclick="alert('Mã nguồn nhân hệ thống!')"><i class="fas fa-file-code"></i><span>kernel.c</span></div>
+                    <div class="file-icon" onclick="alert('Dự án mô phỏng hệ điều hành Linux Ubuntu bằng HTML/CSS/JS.')"><i class="fas fa-file-alt"></i><span>README.txt</span></div>
                 </div>
             </div>
         </div>
@@ -121,7 +121,7 @@
                 <div class="window-title">Rhythmbox Music Player</div>
             </div>
             <div class="window-body music-body">
-                <i class="fas fa-music disc-anime"></i>
+                <i class="fas fa-compact-disc disc-anime"></i>
                 <div class="music-info">
                     <h4>Lo-Fi Coding Beats</h4>
                     <p>Ubuntu System Radio</p>
@@ -131,7 +131,7 @@
                         <i class="fas fa-step-forward"></i>
                     </div>
                 </div>
-                <!-- Nhạc lofi nền chạy ngầm khi mở -->
+                <!-- Nhạc nền phát trực tuyến public công khai -->
                 <audio id="bg-music" src="https://soundhelix.com" loop></audio>
             </div>
         </div>
@@ -149,7 +149,7 @@
             <div class="window-body about-body">
                 <img src="https://wikimedia.org" alt="Ubuntu Logo" width="60">
                 <h3>Ubuntu Linux WebOS</h3>
-                <p>Phiên bản: 2.0.0 Stable</p>
+                <p>Phiên bản: 2.5.0 Stable (Full Fixed)</p>
                 <p>Công nghệ: HTML5, CSS3, Vanilla JS</p>
                 <button onclick="closeWindow('about-window')">Đóng cài đặt</button>
             </div>
