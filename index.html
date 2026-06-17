@@ -106,7 +106,7 @@
             <div class="window-body" style="padding:0; background:#fff; height: calc(100% - 72px);"><iframe src="https://google.com/webhp?igu=1" style="width:100%; height:100%; border:none; background:#fff;"></iframe></div>
         </div>
 
-                <!-- APP GAME MINECRAFT 1.8.8 (FIX LINK 100% CHẠY MƯỢT) -->
+                        <!-- APP GAME MINECRAFT 1.8.8 (ĐÃ FIX BẰNG LINK DIRECT WASM BẤT TỬ) -->
         <div id="minecraft-window" class="window hidden" style="width: 820px; height: 540px; top: 60px; left: 180px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
@@ -114,11 +114,11 @@
                     <span class="dot minimize" onclick="closeWindow('minecraft-window')"></span>
                     <span class="dot maximize" onclick="toggleMaximize('minecraft-window')"></span>
                 </div>
-                <div class="window-title">Minecraft Java Edition v1.8.8 (Eaglercraft WASM)</div>
+                <div class="window-title">Minecraft Java Edition v1.8.8 (Eaglercraft Cloud-WASM)</div>
             </div>
             <div class="window-body" style="padding:0; background:#000; height: calc(100% - 36px); width: 100%;">
-                <!-- Link Client WASM trực tiếp, không bao giờ lo chết IP hay bị chặn iframe -->
-                <iframe src="https://eaglercraft.com/play?version=1.8.8-wasm" 
+                <!-- Tận dụng link WASM trực diện của bạn, cấp full quyền để mở được chế độ toàn màn hình -->
+                <iframe src="https://play.eaglercraft.win/eagler-files/wasm/1.8/main/" 
                         allowfullscreen="true" 
                         webkitallowfullscreen="true" 
                         mozallowfullscreen="true" 
@@ -127,6 +127,7 @@
                 </iframe>
             </div>
         </div>
+
 
 
     </div>
