@@ -14,10 +14,10 @@ function openWindow(id) {
     const win = document.getElementById(id);
     win.classList.remove('hidden', 'closing');
     
-    // Tự động căn giữa màn hình ngẫu nhiên một chút khi mở ứng dụng để không đè khít lên nhau
+    // Tự động sắp xếp lệch nhau một chút để các ứng dụng không bị đè khít hoàn toàn lên nhau
     if (!win.style.top) {
-        win.style.top = (80 + Math.random() * 50) + "px";
-        win.style.left = (100 + Math.random() * 100) + "px";
+        win.style.top = (60 + Math.random() * 60) + "px";
+        win.style.left = (80 + Math.random() * 80) + "px";
     }
     
     bringToFront(win);
@@ -36,7 +36,7 @@ function bringToFront(clickedWindow) {
     clickedWindow.style.zIndex = topZIndex;
 }
 
-// 3. Cơ chế kéo thả các cửa sổ Gtk Linux
+// 3. Cơ chế kéo thả các cửa sổ Gtk Linux mượt mà
 function dragElement(header, event) {
     const targetElement = header.parentElement;
     bringToFront(targetElement);
@@ -57,7 +57,7 @@ function dragElement(header, event) {
         let newTop = targetElement.offsetTop - pos2;
         let newLeft = targetElement.offsetLeft - pos1;
 
-        if (newTop < 28) newTop = 28; // Ngăn kéo lọt lên trên Topbar
+        if (newTop < 28) newTop = 28; // Giới hạn không cho lọt lên trên Topbar
 
         targetElement.style.top = newTop + "px";
         targetElement.style.left = newLeft + "px";
@@ -76,7 +76,7 @@ const disc = document.querySelector('.disc-anime');
 
 function toggleMusic() {
     if (audio.paused) {
-        audio.play();
+        audio.play().catch(err => console.log("Cần click chuột vào web trước để kích hoạt phát nhạc công khai"));
         playBtn.className = "fas fa-pause";
         disc.style.animationPlayState = "running";
     } else {
@@ -103,12 +103,12 @@ if(terminalInput) {
             responseLine.className = 'terminal-text';
 
             if (command === 'help') {
-                responseLine.innerHTML = "Lệnh khả dụng: <br>- <span style='color:#50fa7b'>neofetch</span>: Xem cấu hình hệ điều hành<br>- <span style='color:#8be9fd'>ls</span>: Xem các file trong thư mục<br>- <span style='color:#ff79c6'>clear</span>: Xóa màn hình dòng lệnh";
+                responseLine.innerHTML = "Lệnh khả dụng: <br>- <span style='color:#50fa7b'>neofetch</span>: Xem cấu hình hệ điều hành<br>- <span style='color:#8be9fd'>ls</span>: Xem danh sách các file tệp tin<br>- <span style='color:#ff79c6'>clear</span>: Xóa sạch màn hình dòng lệnh";
             } else if (command === 'neofetch') {
                 responseLine.innerHTML = `
-                    <span style='color:#e95420'><b>OS:</b></span> Ubuntu WebOS v2.0 Linux<br>
+                    <span style='color:#e95420'><b>OS:</b></span> Ubuntu WebOS v2.5 Linux<br>
                     <span style='color:#e95420'><b>Host:</b></span> Vercel Cloud Server<br>
-                    <span style='color:#e95420'><b>Kernel:</b></span> Browser JavaScript Engine<br>
+                    <span style='color:#e95420'><b>Kernel:</b></span> Browser JavaScript V8 Engine<br>
                     <span style='color:#e95420'><b>DE:</b></span> GNOME Web Shell`;
             } else if (command === 'ls') {
                 responseLine.innerHTML = "<span style='color:#60A5FA'>Projects/</span> &nbsp;&nbsp; <span style='color:#60A5FA'>Photos/</span> &nbsp;&nbsp; kernel.c &nbsp;&nbsp; README.txt";
@@ -127,7 +127,7 @@ if(terminalInput) {
             }
 
             this.value = '';
-            body.scrollTop = body.scrollHeight; // Tự động cuộn xuống dưới cùng
+            body.scrollTop = body.scrollHeight; 
         }
     });
 }
