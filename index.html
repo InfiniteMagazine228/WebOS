@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ubuntu Linux WebOS v9.0 - Xterm.js Native</title>
+    <title>Ubuntu Linux WebOS v10.0 - Full APT Package System</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Nạp thư viện CSS và JS của Xterm.js trực tiếp từ CDN để dựng Terminal nội bộ -->
+    <!-- Nạp engine terminal nội bộ Xterm.js để không bị vỡ giao diện menu xám -->
     <link rel="stylesheet" href="https://cloudflare.com" />
     <script src="https://cloudflare.com"></script>
 </head>
 <body>
 
-    <!-- Hệ thống thông báo nổi (Notification) -->
+    <!-- Khung thông báo hệ thống GNOME -->
     <div id="notification-toast" class="toast hidden">
         <div class="toast-header">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e95420" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -32,6 +32,7 @@
 
     <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
     <div class="side-dock" id="main-dock">
+        <!-- Chỉ để duy nhất app Terminal mặc định khi khởi động -->
         <div class="dock-item" id="dock-terminal" onclick="openWindow('terminal-window')">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
             <span class="tooltip">Terminal (Win+T)</span>
@@ -42,10 +43,10 @@
         </div>
     </div>
 
-    <!-- Không gian màn hình Desktop chứa cửa sổ -->
+    <!-- Vùng không gian nền chứa các cửa sổ ứng dụng -->
     <div class="desktop" id="desktop-area">
 
-        <!-- CỬA SỔ TERMINAL NATIVE XTERM.JS (KHÔNG DÙNG IFRAME) -->
+        <!-- CỬA SỔ TERMINAL NỘI BỘ XTERM -->
         <div id="terminal-window" class="window" style="width: 720px; height: 440px; top: 70px; left: 110px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
@@ -53,9 +54,8 @@
                     <span class="dot minimize" onclick="closeWindow('terminal-window')"></span>
                     <span class="dot maximize" onclick="toggleMaximize('terminal-window')"></span>
                 </div>
-                <div class="window-title">ubuntu@native-shell: ~</div>
+                <div class="window-title">ubuntu@apt-core: ~</div>
             </div>
-            <!-- Ô chứa đối tượng Terminal của Xterm.js, ăn khít khói vào trong trang web -->
             <div class="window-body terminal-integrated-body" id="xterm-container"></div>
         </div>
 
@@ -71,21 +71,38 @@
             </div>
             <div class="window-body about-body">
                 <img src="https://wikimedia.org" alt="Ubuntu Logo" width="55">
-                <h3>Ubuntu WebOS v9.0</h3>
-                <p>Tích hợp trực tiếp engine giả lập dòng lệnh Xterm.js cục bộ vào cấu trúc mã nguồn trang web.</p>
+                <h3>Ubuntu WebOS v10.0</h3>
+                <p>Mô phỏng nhân quản lý gói cài đặt nâng cao bằng Xterm Core Sandbox.</p>
                 <button class="ubuntu-btn" onclick="closeWindow('about-window')">Đóng</button>
             </div>
         </div>
 
-        <!-- CỬA SỔ MINECRAFT CHỜ KHỞI ĐỘNG -->
-        <div id="minecraft-window" class="window hidden" style="width: 820px; height: 540px; top: 60px; left: 180px;">
+        <!-- KHO CHỨA CẤU TRÚC APP SẴN SÀNG ĐỂ APT LẬP TRÌNH BUNG RA KHI CÀI ĐẶT -->
+        <!-- App VS Code -->
+        <div id="vscode-window" class="window hidden" style="width: 850px; height: 550px; top: 40px; left: 140px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots"><span class="dot close" onclick="closeWindow('vscode-window')"></span><span class="dot minimize" onclick="closeWindow('vscode-window')"></span><span class="dot maximize" onclick="toggleMaximize('vscode-window')"></span></div>
+                <div class="window-title">Visual Studio Code</div>
+            </div>
+            <div class="window-body" style="padding:0;"><iframe src="https://vscode.dev" style="width:100%; height:100%; border:none;"></iframe></div>
+        </div>
+
+        <!-- App Minecraft -->
+        <div id="minecraft-window" class="window hidden" style="width: 820px; height: 540px; top: 50px; left: 160px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots"><span class="dot close" onclick="closeWindow('minecraft-window')"></span><span class="dot minimize" onclick="closeWindow('minecraft-window')"></span><span class="dot maximize" onclick="toggleMaximize('minecraft-window')"></span></div>
-                <div class="window-title">Minecraft Java Edition v1.8.8 (Eaglercraft Cloud-WASM)</div>
+                <div class="window-title">Minecraft Java 1.8.8</div>
             </div>
-            <div class="window-body" style="padding:0; background:#000; height: calc(100% - 36px); width: 100%;">
-                <iframe src="https://eaglercraft.win" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" msallowfullscreen="true" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+            <div class="window-body" style="padding:0; background:#000;"><iframe src="https://eaglercraft.win" allowfullscreen="true" style="width: 100%; height: 100%; border: none; display: block;"></iframe></div>
+        </div>
+
+        <!-- App Discord -->
+        <div id="discord-window" class="window hidden" style="width: 840px; height: 520px; top: 60px; left: 150px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots"><span class="dot close" onclick="closeWindow('discord-window')"></span><span class="dot minimize" onclick="closeWindow('discord-window')"></span><span class="dot maximize" onclick="toggleMaximize('discord-window')"></span></div>
+                <div class="window-title">Discord Messenger</div>
             </div>
+            <div class="window-body" style="padding:0;"><iframe src="https://discord.com" style="width:100%; height:100%; border:none;"></iframe></div>
         </div>
 
     </div>
