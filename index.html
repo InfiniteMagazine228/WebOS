@@ -3,53 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ubuntu Linux WebOS v3.0 Stable</title>
+    <title>Ubuntu Linux WebOS v6.0</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Link Font Awesome dự phòng tối ưu không lo mất icon -->
-    <link rel="stylesheet" href="https://cloudflare.com">
+    <!-- Nạp trực tiếp Font Awesome SVG Icons để không bao giờ lỗi hiển thị icon -->
+    <link rel="stylesheet" href="https://cloudflare.com" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
+    <!-- Hệ thống thông báo nổi (Notification Toast) -->
+    <div id="notification-toast" class="toast hidden">
+        <div class="toast-header">
+            <i class="fas fa-info-circle"></i> <span id="toast-title">Hệ thống</span>
+        </div>
+        <div class="toast-body" id="toast-msg">Nội dung thông báo</div>
+    </div>
+
     <!-- Thanh trạng thái trên cùng -->
     <div class="top-bar">
-        <div class="left" onclick="toggleMainMenu()">Activities</div>
+        <div class="left" onclick="showNotification('Ứng dụng', 'Phím tắt khả dụng: Win+X (Menu), Win+T (Terminal), Win+D (Ẩn hiện All)')">Activities</div>
         <div class="center" id="live-clock">00:00:00</div>
         <div class="right">
             <i class="fas fa-wifi"></i>
             <i class="fas fa-volume-up"></i>
             <i class="fas fa-battery-full"></i>
-            <i class="fas fa-power-off" onclick="showNotification('Hệ thống', 'Đang tắt nguồn WebOS...')"></i>
+            <i class="fas fa-power-off" onclick="showNotification('Hệ thống', 'Đang tắt nguồn máy chủ ảo...')"></i>
         </div>
     </div>
 
     <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
-    <div class="side-dock" id="ubuntu-dock">
-        <div class="dock-item" onclick="openWindow('terminal-window')" data-app="terminal">
+    <div class="side-dock" id="main-dock">
+        <!-- Các app mặc định ban đầu -->
+        <div class="dock-item" id="dock-terminal" onclick="openWindow('terminal-window')">
             <i class="fas fa-terminal"></i>
-            <span class="tooltip">Terminal (Super+T)</span>
+            <span class="tooltip">Terminal (Win+T)</span>
         </div>
-        <div class="dock-item" onclick="openWindow('browser-window')" data-app="browser">
-            <i class="fab fa-firefox-browser"></i>
-            <span class="tooltip">Firefox Browser (Super+B)</span>
-        </div>
-        <!-- Các app cài thêm qua apt sẽ tự động chèn vào đây -->
-        <div class="dock-item settings-icon" onclick="openWindow('about-window')" data-app="about">
+        <div class="dock-item" id="dock-about" onclick="openWindow('about-window')">
             <i class="fas fa-info-circle"></i>
             <span class="tooltip">About System</span>
         </div>
+        <!-- App mới được cài bằng lệnh sudo apt install sẽ tự sinh vào đây -->
     </div>
 
-    <!-- Trung tâm thông báo (Notification toast) -->
-    <div id="notification-zone" class="notification hidden">
-        <strong id="noti-title">Hệ thống</strong>
-        <p id="noti-body">Nội dung thông báo</p>
-    </div>
+    <!-- Khu vực Desktop chứa cửa sổ -->
+    <div class="desktop" id="desktop-area">
 
-    <!-- Không gian làm việc Desktop -->
-    <div class="desktop" onclick="closeAllMenus()">
-
-        <!-- APP 1: TERMINAL LINUX (Có hỗ trợ sudo apt install) -->
-        <div id="terminal-window" class="window" style="width: 600px; height: 38px; top: 100px; left: 150px;">
+        <!-- CỬA SỔ 1: TERMINAL (Có tính năng cài đặt gói phần mềm apt) -->
+        <div id="terminal-window" class="window" style="width: 600px; height: 38px0px; top: 100px; left: 150px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('terminal-window')"></span>
@@ -58,12 +57,11 @@
                 </div>
                 <div class="window-title">ubuntu@webos: ~</div>
             </div>
-            <div class="window-body terminal-body">
-                <p class="terminal-text">Welcome to Ubuntu WebOS v3.0! (Hotkeys: Super+T to open Terminal)</p>
-                <p class="terminal-text">Thử gõ lệnh: <span style="color: #f1fa8c;">ls</span>, <span style="color: #50fa7b;">neofetch</span>, hoặc cài app bằng lệnh dưới:</p>
-                <p class="terminal-text" style="color: #ff79c6;">sudo apt install music-player</p>
-                <p class="terminal-text" style="color: #ff79c6;">sudo apt install files-manager</p>
-                <div class="terminal-history" id="terminal-history-container"></div>
+            <div class="window-body terminal-body" onclick="document.getElementById('terminal-input').focus()">
+                <p class="terminal-text">Welcome to Ubuntu Linux WebOS v4.0!</p>
+                <p class="terminal-text">Thử gõ lệnh: <span style="color: #f1fa8c;">sudo apt install firefox</span> hoặc <span style="color: #f1fa8c;">sudo apt install music</span></p>
+                <p class="terminal-text" style="color: #6272a4;">Gợi ý phần mềm: firefox, music, paint, doom</p>
+                <div id="terminal-history"></div>
                 <div class="terminal-input-line">
                     <span>ubuntu@webos:~$ &nbsp;</span>
                     <input type="text" id="terminal-input" autofocus autocomplete="off">
@@ -71,86 +69,57 @@
             </div>
         </div>
 
-        <!-- APP 2: TRÌNH DUYỆT FIREFOX -->
-        <div id="browser-window" class="window hidden" style="width: 750px; height: 480px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots">
-                    <span class="dot close" onclick="closeWindow('browser-window')"></span>
-                    <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
-                    <span class="dot maximize" onclick="toggleMaximize('browser-window')"></span>
-                </div>
-                <div class="window-title">Firefox Web Browser (Paint Tool)</div>
-            </div>
-            <div class="window-body" style="padding: 0;">
-                <iframe src="https://js.org" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
-            </div>
-        </div>
-
-        <!-- APP 3: TRÌNH QUẢN LÝ FILE (Cài qua APT) -->
-        <div id="files-window" class="window hidden" style="width: 520px; height: 360px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots">
-                    <span class="dot close" onclick="closeWindow('files-window')"></span>
-                    <span class="dot minimize" onclick="closeWindow('files-window')"></span>
-                    <span class="dot maximize" onclick="toggleMaximize('files-window')"></span>
-                </div>
-                <div class="window-title">Files Manager</div>
-            </div>
-            <div class="window-body files-body">
-                <div class="files-sidebar">
-                    <div class="active"><i class="fas fa-home"></i> Home</div>
-                    <div><i class="fas fa-desktop"></i> Desktop</div>
-                    <div><i class="fas fa-file"></i> Documents</div>
-                </div>
-                <div class="files-content">
-                    <div class="file-icon" onclick="showNotification('Files', 'Thư mục trống')"><i class="fas fa-folder"></i><span>Projects</span></div>
-                    <div class="file-icon" onclick="showNotification('Files', 'Mã nguồn hạt nhân')"><i class="fas fa-file-code"></i><span>kernel.c</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- APP 4: TRÌNH NGHE NHẠC (Cài qua APT) -->
-        <div id="music-window" class="window hidden" style="width: 400px; height: 220px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots">
-                    <span class="dot close" onclick="closeWindow('music-window')"></span>
-                    <span class="dot minimize" onclick="closeWindow('music-window')"></span>
-                    <span class="dot maximize"></span>
-                </div>
-                <div class="window-title">Rhythmbox Music Player</div>
-            </div>
-            <div class="window-body music-body">
-                <i class="fas fa-compact-disc disc-anime" id="music-disc"></i>
-                <div class="music-info">
-                    <h4>Lo-Fi Coding Radio</h4>
-                    <p>Ubuntu Live Stream</p>
-                    <div class="music-controls">
-                        <i class="fas fa-step-backward"></i>
-                        <i class="fas fa-play" id="play-btn" onclick="toggleMusic()"></i>
-                        <i class="fas fa-step-forward"></i>
-                    </div>
-                </div>
-                <audio id="bg-music" src="https://soundhelix.com" loop></audio>
-            </div>
-        </div>
-
-        <!-- APP 5: ABOUT SYSTEM -->
-        <div id="about-window" class="window hidden" style="width: 420px; height: 280px;">
+        <!-- CỬA SỔ 2: ABOUT SYSTEM -->
+        <div id="about-window" class="window hidden" style="width: 420px; height: 280px; top: 120px; left: 200px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('about-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('about-window')"></span>
-                    <span class="dot maximize"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('about-window')"></span>
                 </div>
                 <div class="window-title">About Ubuntu WebOS</div>
             </div>
             <div class="window-body about-body">
                 <img src="https://wikimedia.org" alt="Ubuntu Logo" width="60">
-                <h3>Ubuntu Linux WebOS v3.0</h3>
-                <p>Hệ thống APT Package Manager: Kích hoạt</p>
-                <p>Phím tắt toàn hệ thống: Sẵn sàng</p>
-                <button onclick="closeWindow('about-window')">Đóng</button>
+                <h3>Ubuntu Linux WebOS v4.0</h3>
+                <p>Mô phỏng nhân hệ thống và cài đặt gói APT nâng cao.</p>
+                <p style="font-size: 11px; color: #888;">Nhấn phím <kbd>Win</kbd> + <kbd>X</kbd> để hiện danh sách ứng dụng.</p>
+                <button class="ubuntu-btn" onclick="closeWindow('about-window')">Đóng</button>
             </div>
+        </div>
+
+        <!-- KHO LƯU TRỮ CẤU TRÚC ỨNG DỤNG ĐỂ APT TỰ ĐỘNG ĐẺ CỬA SỔ KHI CÀI ĐẶT -->
+        <!-- App Firefox -->
+        <div id="firefox-window" class="window hidden DynamicApp" style="width: 750px; height: 480px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots"><span class="dot close" onclick="closeWindow('firefox-window')"></span><span class="dot minimize" onclick="closeWindow('firefox-window')"></span><span class="dot maximize" onclick="toggleMaximize('firefox-window')"></span></div>
+                <div class="window-title">Firefox Web Browser</div>
+            </div>
+            <div class="window-body" style="padding:0;"><iframe src="https://js.org" style="width:100%; height:100%; border:none;"></iframe></div>
+        </div>
+
+        <!-- App Music -->
+        <div id="music-window" class="window hidden DynamicApp" style="width: 400px; height: 200px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots"><span class="dot close" onclick="closeWindow('music-window')"></span><span class="dot minimize" onclick="closeWindow('music-window')"></span><span class="dot maximize" onclick="toggleMaximize('music-window')"></span></div>
+                <div class="window-title">Music Player</div>
+            </div>
+            <div class="window-body music-body" style="padding:20px; display:flex; align-items:center; gap:20px; background:#222;">
+                <i class="fas fa-compact-disc fa-spin" style="font-size:50px; color:#e95420;"></i>
+                <div>
+                    <h4>Ubuntu Live Radio</h4>
+                    <audio src="https://soundhelix.com" controls style="margin-top:10px; width:220px;"></audio>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Game Doom -->
+        <div id="doom-window" class="window hidden DynamicApp" style="width: 680px; height: 440px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots"><span class="dot close" onclick="closeWindow('doom-window')"></span><span class="dot minimize" onclick="closeWindow('doom-window')"></span><span class="dot maximize" onclick="toggleMaximize('doom-window')"></span></div>
+                <div class="window-title">DOOM Retro Classic (Shareware)</div>
+            </div>
+            <div class="window-body" style="padding:0;"><iframe src="https://dos.zone" style="width:100%; height:100%; border:none;" allowfullscreen></iframe></div>
         </div>
 
     </div>
