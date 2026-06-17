@@ -189,8 +189,13 @@ function executeInstallSuccess(pkgId) {
     mainDock.insertBefore(newDockItem, document.getElementById('dock-about'));
 }
 
-// 6. HỆ THỐNG PHÍM TẮT ĐA NHIỆM (SHORTCUTS KEYBOARD)
+// Ghi đè đoạn logic sự kiện keydown dưới cùng của script.js để chơi game không bị kẹt phím
 window.addEventListener('keydown', function(e) {
+    // Nếu người dùng đang tập trung gõ lệnh trong Terminal hoặc đang chơi game Minecraft thì tạm dừng phím tắt hệ thống WebOS
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'IFRAME') {
+        return; // Cho phép phím truyền thẳng vào game
+    }
+
     const isModifier = e.altKey || e.metaKey; 
 
     if (isModifier && e.key.toLowerCase() === 't') {
