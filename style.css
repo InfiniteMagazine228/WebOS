@@ -14,7 +14,6 @@ body {
     overflow: hidden;
 }
 
-/* Khung thông báo hệ thống */
 .toast {
     position: fixed;
     top: 40px;
@@ -34,7 +33,6 @@ body {
 .toast-header { display: flex; align-items: center; font-size: 13px;}
 .toast-body { font-size: 12px; color: #ccc; margin-top: 6px; }
 
-/* Top Bar */
 .top-bar {
     height: 28px;
     background: rgba(16, 16, 16, 0.75);
@@ -53,7 +51,6 @@ body {
 .top-bar .left { cursor: pointer; font-weight: 500;}
 .top-bar .right svg { cursor: pointer; margin-left: 12px; }
 
-/* Ubuntu Dock */
 .side-dock {
     position: absolute;
     left: 8px;
@@ -91,10 +88,8 @@ body {
 .dock-item:hover .tooltip { visibility: visible; opacity: 1; }
 .settings-icon { margin-top: auto; }
 
-/* Desktop */
 .desktop { position: absolute; top: 28px; left: 76px; right: 0; bottom: 0; z-index: 50; }
 
-/* Khung cửa sổ Gtk */
 .window {
     position: absolute;
     background: rgba(30, 30, 30, 0.88);
@@ -126,18 +121,13 @@ body {
 .dot.minimize { background: #F59E0B; }
 .dot.maximize { background: #10B981; }
 .window-title { color: #ddd; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; }
-.window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
+.window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; width: 100%; height: 100%; }
 
-/* FIX LIỀN KHUNG TERMINAL NỘI BỘ (Ép Xterm gánh full diện tích) */
 .terminal-integrated-body {
     background: #1C131A !important;
     padding: 10px;
     height: calc(100% - 36px);
     width: 100%;
-}
-/* Làm mượt font chữ chữ hiển thị của xterm */
-.xterm .xterm-screen {
-    cursor: text;
 }
 
 .about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 12px; background: #2A2A2A; }
