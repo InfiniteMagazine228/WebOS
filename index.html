@@ -3,55 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ubuntu WebOS v3.0 Stable - Full Fixed</title>
+    <title>Ubuntu Linux WebOS v3.0 Stable</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Link Font Awesome dự phòng tối ưu không lo mất icon -->
+    <link rel="stylesheet" href="https://cloudflare.com">
 </head>
 <body>
 
-    <!-- Thanh trạng thái trên cùng (Top Bar) -->
+    <!-- Thanh trạng thái trên cùng -->
     <div class="top-bar">
-        <div class="left" onclick="toggleApplicationsMenu()">Activities</div>
+        <div class="left" onclick="toggleMainMenu()">Activities</div>
         <div class="center" id="live-clock">00:00:00</div>
         <div class="right">
-            <span>🛜</span>
-            <span>🔊</span>
-            <span>🔋</span>
-            <span style="cursor:pointer;" onclick="alert('Đang tắt nguồn WebOS...')">⏻</span>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-volume-up"></i>
+            <i class="fas fa-battery-full"></i>
+            <i class="fas fa-power-off" onclick="showNotification('Hệ thống', 'Đang tắt nguồn WebOS...')"></i>
         </div>
     </div>
 
-    <!-- Hướng dẫn phím tắt nhanh ẩn hiện góc màn hình -->
-    <div class="shortcut-tip">Phím tắt: <b>Super(Win) + T</b>: Terminal | <b>Win + F</b>: Files | <b>Win + B</b>: Browser | <b>Win + D</b>: Hiện Desktop</div>
-
-    <!-- Thanh ứng dụng bên trái (Ubuntu Dock bằng SVG nguyên bản - Không lo lỗi kết nối) -->
-    <div class="side-dock">
-        <div class="dock-item" onclick="openWindow('terminal-window')" title="Terminal (Win + T)">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20,19H4A2,2 0 0,1 2,17V7A2,2 0 0,1 4,5H20A2,2 0 0,1 22,7V17A2,2 0 0,1 20,19M4,7V17H20V7H4M6,9H11V11H6V9M6,13H15V15H6V13Z"/></svg>
-            <span class="tooltip">Terminal (Win+T)</span>
+    <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
+    <div class="side-dock" id="ubuntu-dock">
+        <div class="dock-item" onclick="openWindow('terminal-window')" data-app="terminal">
+            <i class="fas fa-terminal"></i>
+            <span class="tooltip">Terminal (Super+T)</span>
         </div>
-        <div class="dock-item" onclick="openWindow('browser-window')" title="Firefox Browser (Win + B)">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12C20,13.16 19.75,14.25 19.31,15.24C18.84,14.07 17.5,13.14 16,13.04C15.82,12.39 15.46,11.8 15,11.35V10A3,3 0 0,0 12,7A3,3 0 0,0 9,10V11.14C8.07,11.45 7.34,12.18 7.03,13.11C5.45,13.5 4.18,14.68 4.03,16.27C4,14.93 4,13.5 4,12A8,8 0 0,1 12,4M9,10A1,1 0 0,1 10,9A1,1 0 0,1 11,10V11H9V10M12,14A1,1 0 0,1 13,15A1,1 0 0,1 12,16A1,1 0 0,1 11,15A1,1 0 0,1 12,14Z"/></svg>
-            <span class="tooltip">Firefox Browser (Win+B)</span>
+        <div class="dock-item" onclick="openWindow('browser-window')" data-app="browser">
+            <i class="fab fa-firefox-browser"></i>
+            <span class="tooltip">Firefox Browser (Super+B)</span>
         </div>
-        <div class="dock-item" onclick="openWindow('files-window')" title="Files Manager (Win + F)">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,4H12L10,4Z"/></svg>
-            <span class="tooltip">Files Manager (Win+F)</span>
-        </div>
-        <div class="dock-item" onclick="openWindow('music-window')" title="Music Player (Win + M)">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,11A1,1 0 0,1 13,12A1,1 0 0,1 12,13A1,1 0 0,1 11,12A1,1 0 0,1 12,11Z"/></svg>
-            <span class="tooltip">Rhythmbox Music (Win+M)</span>
-        </div>
-        <div class="dock-item settings-icon" onclick="openWindow('about-window')" title="About System">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11V9M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/></svg>
+        <!-- Các app cài thêm qua apt sẽ tự động chèn vào đây -->
+        <div class="dock-item settings-icon" onclick="openWindow('about-window')" data-app="about">
+            <i class="fas fa-info-circle"></i>
             <span class="tooltip">About System</span>
         </div>
     </div>
 
-    <!-- Không gian Desktop -->
-    <div class="desktop" id="desktop-area">
+    <!-- Trung tâm thông báo (Notification toast) -->
+    <div id="notification-zone" class="notification hidden">
+        <strong id="noti-title">Hệ thống</strong>
+        <p id="noti-body">Nội dung thông báo</p>
+    </div>
 
-        <!-- APP 1: TERMINAL LINUX -->
-        <div id="terminal-window" class="window hidden" style="width: 550px; height: 350px;">
+    <!-- Không gian làm việc Desktop -->
+    <div class="desktop" onclick="closeAllMenus()">
+
+        <!-- APP 1: TERMINAL LINUX (Có hỗ trợ sudo apt install) -->
+        <div id="terminal-window" class="window" style="width: 600px; height: 38px; top: 100px; left: 150px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('terminal-window')"></span>
@@ -61,41 +59,34 @@
                 <div class="window-title">ubuntu@webos: ~</div>
             </div>
             <div class="window-body terminal-body">
-                <p class="terminal-text">Welcome to Ubuntu WebOS v3.0!</p>
-                <p class="terminal-text">Type <span style="color: #50fa7b;">'help'</span> or <span style="color: #8be9fd;">'neofetch'</span> to interact.</p>
+                <p class="terminal-text">Welcome to Ubuntu WebOS v3.0! (Hotkeys: Super+T to open Terminal)</p>
+                <p class="terminal-text">Thử gõ lệnh: <span style="color: #f1fa8c;">ls</span>, <span style="color: #50fa7b;">neofetch</span>, hoặc cài app bằng lệnh dưới:</p>
+                <p class="terminal-text" style="color: #ff79c6;">sudo apt install music-player</p>
+                <p class="terminal-text" style="color: #ff79c6;">sudo apt install files-manager</p>
+                <div class="terminal-history" id="terminal-history-container"></div>
                 <div class="terminal-input-line">
                     <span>ubuntu@webos:~$ &nbsp;</span>
-                    <input type="text" id="terminal-input" autocomplete="off">
+                    <input type="text" id="terminal-input" autofocus autocomplete="off">
                 </div>
             </div>
         </div>
 
-        <!-- APP 2: FIREFOX BROWSER GIẢ LẬP (Tránh tuyệt đối lỗi iframe chối từ kết nối) -->
-        <div id="browser-window" class="window hidden" style="width: 680px; height: 440px;">
+        <!-- APP 2: TRÌNH DUYỆT FIREFOX -->
+        <div id="browser-window" class="window hidden" style="width: 750px; height: 480px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('browser-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
                     <span class="dot maximize" onclick="toggleMaximize('browser-window')"></span>
                 </div>
-                <div class="window-title">Firefox Web Browser</div>
+                <div class="window-title">Firefox Web Browser (Paint Tool)</div>
             </div>
-            <div style="background: #38383D; padding: 6px 10px; display: flex; gap: 10px; align-items: center;">
-                <div style="color: #aaa; display: flex; gap: 12px; font-size: 14px; cursor:default;"> ⬅️ ➡️ 🔄 </div>
-                <div style="flex-grow: 1; background: #1C1B22; border-radius: 4px; padding: 4px 10px; color: #fff; font-size: 13px; display: flex; align-items: center; gap: 8px;">
-                    <span style="color:#2ecc71">🔒</span>
-                    <input type="text" value="https://mozilla.org" style="background: transparent; border: none; outline: none; color: #fff; width: 100%;" readonly>
-                </div>
-            </div>
-            <div class="window-body" style="background: #1C1B22; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; gap: 15px;">
-                <div style="font-size: 50px;">🦊</div>
-                <h2 style="color: #fff; font-weight: 400; font-size: 20px;">Welcome to Firefox</h2>
-                <p style="color: #aaa; max-width: 420px; font-size: 13px; line-height: 1.5;">Hệ điều hành WebOS của bạn hiện được nhúng trên Itch.io. Để mở các trang web khác không bị chặn bảo mật, hãy sử dụng ứng dụng Terminal hoặc Files.</p>
-                <button onclick="openWindow('terminal-window'); closeWindow('browser-window');" style="background: #E95420; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px;">Mở Terminal Thay Thế</button>
+            <div class="window-body" style="padding: 0;">
+                <iframe src="https://js.org" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
             </div>
         </div>
 
-        <!-- APP 3: FILES MANAGER -->
+        <!-- APP 3: TRÌNH QUẢN LÝ FILE (Cài qua APT) -->
         <div id="files-window" class="window hidden" style="width: 520px; height: 360px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
@@ -103,26 +94,23 @@
                     <span class="dot minimize" onclick="closeWindow('files-window')"></span>
                     <span class="dot maximize" onclick="toggleMaximize('files-window')"></span>
                 </div>
-                <div class="window-title">Files</div>
+                <div class="window-title">Files Manager</div>
             </div>
             <div class="window-body files-body">
                 <div class="files-sidebar">
-                    <div class="active">📁 Home</div>
-                    <div>🖥️ Desktop</div>
-                    <div>📄 Documents</div>
-                    <div>📥 Downloads</div>
+                    <div class="active"><i class="fas fa-home"></i> Home</div>
+                    <div><i class="fas fa-desktop"></i> Desktop</div>
+                    <div><i class="fas fa-file"></i> Documents</div>
                 </div>
                 <div class="files-content">
-                    <div class="file-icon" onclick="alert('Thư mục Projects rỗng')">📁<span>Projects</span></div>
-                    <div class="file-icon" onclick="alert('Thư mục Photos rỗng')">📁<span>Photos</span></div>
-                    <div class="file-icon" onclick="alert('Mã nguồn Kernel hệ thống!')">📄<span>kernel.c</span></div>
-                    <div class="file-icon" onclick="alert('Ubuntu Linux WebOS viết bằng HTML/CSS/JS thuần.')">📝<span>README.txt</span></div>
+                    <div class="file-icon" onclick="showNotification('Files', 'Thư mục trống')"><i class="fas fa-folder"></i><span>Projects</span></div>
+                    <div class="file-icon" onclick="showNotification('Files', 'Mã nguồn hạt nhân')"><i class="fas fa-file-code"></i><span>kernel.c</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- APP 4: MUSIC PLAYER -->
-        <div id="music-window" class="window hidden" style="width: 400px; height: 200px;">
+        <!-- APP 4: TRÌNH NGHE NHẠC (Cài qua APT) -->
+        <div id="music-window" class="window hidden" style="width: 400px; height: 220px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('music-window')"></span>
@@ -132,13 +120,41 @@
                 <div class="window-title">Rhythmbox Music Player</div>
             </div>
             <div class="window-body music-body">
-                <div class="disc-anime" id="music-disc" style="font-size: 50px;">💿</div>
+                <i class="fas fa-compact-disc disc-anime" id="music-disc"></i>
                 <div class="music-info">
-                    <h4 style="margin:0 0 4px 0;">Lo-Fi Coding Beats</h4>
-                    <p style="margin:0 0 12px 0; color:#aaa; font-size:12px;">Ubuntu Radio Stream</p>
+                    <h4>Lo-Fi Coding Radio</h4>
+                    <p>Ubuntu Live Stream</p>
                     <div class="music-controls">
-                        <span onclick="alert('Chức năng đang hoàn thiện')">⏮️</span>
-                        <span id="play-btn" onclick="toggleMusic()" style="cursor:pointer; font-size:20px;">▶️</span>
-                        <span onclick="alert('Chức năng đang hoàn thiện')">⏭️</span>
+                        <i class="fas fa-step-backward"></i>
+                        <i class="fas fa-play" id="play-btn" onclick="toggleMusic()"></i>
+                        <i class="fas fa-step-forward"></i>
                     </div>
                 </div>
+                <audio id="bg-music" src="https://soundhelix.com" loop></audio>
+            </div>
+        </div>
+
+        <!-- APP 5: ABOUT SYSTEM -->
+        <div id="about-window" class="window hidden" style="width: 420px; height: 280px;">
+            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+                <div class="window-dots">
+                    <span class="dot close" onclick="closeWindow('about-window')"></span>
+                    <span class="dot minimize" onclick="closeWindow('about-window')"></span>
+                    <span class="dot maximize"></span>
+                </div>
+                <div class="window-title">About Ubuntu WebOS</div>
+            </div>
+            <div class="window-body about-body">
+                <img src="https://wikimedia.org" alt="Ubuntu Logo" width="60">
+                <h3>Ubuntu Linux WebOS v3.0</h3>
+                <p>Hệ thống APT Package Manager: Kích hoạt</p>
+                <p>Phím tắt toàn hệ thống: Sẵn sàng</p>
+                <button onclick="closeWindow('about-window')">Đóng</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
