@@ -1,4 +1,4 @@
-/* Thiết lập cấu trúc lõi ứng dụng */
+/* Reset css và sửa lỗi tràn của dock */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -9,39 +9,62 @@
 body {
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, #77216F 0%, #5E2750 50%, #E95420 100%);
+    background: linear-gradient(135deg, #661056 0%, #300a24 60%, #e95420 100%);
     background-size: cover;
     overflow: hidden;
 }
 
-/* Khung Top Bar mờ kính */
+/* Khung thông báo góc phải giống Ubuntu shell thật */
+.toast {
+    position: fixed;
+    top: 40px;
+    right: 20px;
+    width: 280px;
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    color: white;
+    z-index: 999999;
+    padding: 12px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    transform: translateY(0);
+}
+.toast.hidden {
+    opacity: 0;
+    transform: translateY(-30px);
+    pointer-events: none;
+}
+.toast-header { font-weight: bold; color: #e95420; margin-bottom: 5px; font-size: 13px;}
+.toast-body { font-size: 13px; color: #ddd; }
+
+/* Top Bar */
 .top-bar {
     height: 28px;
     background: rgba(16, 16, 16, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: #dfdbd2;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 15px;
     font-size: 13px;
-    font-weight: 500;
-    z-index: 999999;
+    z-index: 99999;
     position: relative;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-.top-bar .left { cursor: pointer; padding: 2px 8px; border-radius: 4px; }
-.top-bar .left:hover { background: rgba(255,255,255,0.1); }
+.top-bar .left { cursor: pointer; }
 .top-bar .right i { margin-left: 14px; cursor: pointer; }
 
-/* SỬA LỖI TRÀN DOCK: Dock thông minh tự động co giãn */
+/* Ubuntu Left Dock - FIX TRÀN & NỔI BẬT ICON */
 .side-dock {
     position: absolute;
     left: 8px;
     top: 36px;
     bottom: 8px;
-    width: 58px;
+    width: 60px;
     background: rgba(16, 16, 16, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -50,126 +73,107 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 12px 0;
-    z-index: 99999;
+    z-index: 9999;
     border: 1px solid rgba(255,255,255,0.1);
-    overflow-y: auto;
-    scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+    gap: 12px;
 }
-.side-dock::-webkit-scrollbar { display: none; } /* Ẩn thanh cuộn Chrome/Safari */
 
+/* Thao tác ép icon Font-Awesome luôn xuất hiện sắc nét */
 .dock-item {
     width: 44px;
     height: 44px;
-    margin-bottom: 12px;
     border-radius: 10px;
     display: flex !important;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
-    color: #ffffff;
     cursor: pointer;
     position: relative;
-    flex-shrink: 0;
-    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.25), background 0.15s;
+    background: rgba(255,255,255,0.05);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
 }
-.dock-item i { display: block !important; pointer-events: none; }
-.dock-item:hover { transform: scale(1.15); background: rgba(233, 84, 32, 0.45); }
+.dock-item i {
+    color: #ffffff !important;
+    font-size: 20px !important;
+    display: block !important;
+    pointer-events: none;
+}
+.dock-item:hover {
+    transform: scale(1.15);
+    background: #e95420 !important;
+    box-shadow: 0 5px 15px rgba(233, 84, 32, 0.4);
+}
 
-/* Tooltip */
+/* Tooltip trên dock */
 .dock-item .tooltip {
     position: absolute;
-    left: 68px;
-    background: rgba(20, 20, 20, 0.95);
-    padding: 6px 12px;
-    border-radius: 6px;
+    left: 70px;
+    background: #111;
+    padding: 5px 10px;
+    border-radius: 5px;
     font-size: 11px;
+    color: #fff;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.15s;
+    transition: 0.15s;
     white-space: nowrap;
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    pointer-events: none;
 }
 .dock-item:hover .tooltip { visibility: visible; opacity: 1; }
-.settings-icon { margin-top: auto; margin-bottom: 0px; }
+.settings-icon { margin-top: auto; }
 
-/* Desktop Workspace */
-.desktop { position: absolute; top: 28px; left: 0; right: 0; bottom: 0; z-index: 5; }
+/* Desktop */
+.desktop { position: absolute; top: 28px; left: 76px; right: 0; bottom: 0; }
 
-/* Định dạng Cửa sổ */
+/* Các cửa sổ ứng dụng */
 .window {
     position: absolute;
-    background: rgba(30, 30, 30, 0.92);
+    background: rgba(30, 30, 30, 0.85);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     z-index: 10;
-    transform: scale(1);
-    opacity: 1;
-    transition: width 0.2s, height 0.2s, top 0.2s, left 0.2s;
 }
 .window.hidden { display: none !important; }
-.window.maximized { width: 100vw !important; height: calc(100vh - 28px) !important; top: 0 !important; left: 0 !important; border-radius: 0; }
+.window.maximized {
+    top: 28px !important;
+    left: 76px !important;
+    width: calc(100vw - 76px) !important;
+    height: calc(100vh - 28px) !important;
+    border-radius: 0;
+}
 
-/* Khung Header điều khiển cửa sổ */
+/* Thanh điều hướng Gtk Header */
 .window-header {
     height: 36px;
-    background: #242424;
+    background: #232323;
     display: flex;
     align-items: center;
     padding: 0 14px;
     cursor: move;
     border-bottom: 1px solid rgba(0,0,0,0.3);
-    user-select: none;
 }
 .window-dots { display: flex; gap: 8px; }
 .dot { width: 13px; height: 13px; border-radius: 50%; cursor: pointer; }
-.dot.close { background: #FF5555; }
-.dot.minimize { background: #FFB86C; }
-.dot.maximize { background: #50FA7B; }
-.window-title { color: #f8f8f2; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; pointer-events: none;}
+.dot.close { background: #EF4444; }
+.dot.minimize { background: #F59E0B; }
+.dot.maximize { background: #10B981; }
+.window-title { color: #ddd; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 .window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
-/* Terminal */
-.terminal-body { background: #1E141B; padding: 14px; font-family: 'Courier New', monospace; overflow-y: auto; display: flex; flex-direction: column; }
-.terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.4; word-break: break-all;}
-.terminal-history { display: flex; flex-direction: column; }
-.terminal-input-line { display: flex; align-items: center; color: #f8f8f2; font-size: 13px; margin-top: auto; }
-.terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: monospace; font-size: 13px; flex-grow: 1; }
+/* Terminal Layout */
+.terminal-body { background: #1C131A; padding: 15px; font-family: 'Courier New', monospace; overflow-y: auto; text-shadow: none;}
+.terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.5; font-family: 'Courier New', monospace; }
+.terminal-input-line { display: flex; align-items: center; font-size: 13px; color: #50fa7b;}
+.terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: 'Courier New', monospace; font-size: 13px; flex-grow: 1; }
 
-/* File Explorer App */
-.files-body { display: flex; background: #2D2D2D; height: 100%; }
-.files-sidebar { width: 130px; background: #383838; padding-top: 15px; border-right: 1px solid #1a1a1a; }
-.files-sidebar div { padding: 10px 15px; font-size: 13px; cursor: pointer; color: #ccc; }
-.files-sidebar div.active, .files-sidebar div:hover { background: #E95420; color: white; }
-.files-sidebar div i { margin-right: 8px; }
-.files-content { flex-grow: 1; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; align-content: flex-start; }
-.file-icon { display: flex; flex-direction: column; align-items: center; width: 65px; cursor: pointer; text-align: center; }
-.file-icon i { font-size: 38px; color: #FFB86C; margin-bottom: 6px; }
-.file-icon i.fa-file-code { color: #8be9fd; }
-.file-icon span { font-size: 12px; color: #f8f8f2; }
-
-/* Music Player App */
-.music-body { background: #212121; display: flex; align-items: center; padding: 25px; gap: 25px; height: 100%; }
-.music-body i.fa-compact-disc { font-size: 65px; color: #E95420; }
-.music-info h4 { margin-bottom: 4px; font-size: 16px; color: #fff;}
-.music-info p { font-size: 12px; color: #999; margin-bottom: 15px;}
-.music-controls { display: flex; gap: 22px; font-size: 22px; cursor: pointer; }
-.music-controls i:hover { color: #E95420; }
-.disc-anime { animation: spin 4s linear infinite; animation-play-state: paused; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-
-/* Notification Center */
-.notification { position: absolute; top: 40px; right: 20px; width: 280px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); border-left: 5px solid #E95420; padding: 12px; border-radius: 6px; z-index: 9999999; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 13px; animation: slideIn 0.25s ease-out; }
-@keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
-
-/* About Screen */
-.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; text-align: center; gap: 12px; height: 100%; background: #282828;}
-.about-body h3 { color: #E95420; font-size: 18px;}
-.about-body p { font-size: 13px; color: #bdc3c7; }
-.about-body button { margin-top: 8px; background: #E95420; border: none; color: white; padding: 8px 22px; border-radius: 4px; cursor: pointer; font-size: 13px; }
-.about-body button:hover { background: #b83d12; }
+/* CSS phụ cho About */
+.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 12px; background: #2A2A2A;}
+.ubuntu-btn { background: #E95420; border: none; color: white; padding: 8px 24px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
+.ubuntu-btn:hover { background: #c64113; }
+kbd { background: #444; padding: 2px 6px; border-radius: 4px; font-size: 11px; border: 1px solid #666;}
