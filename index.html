@@ -69,20 +69,21 @@
             </div>
         </div>
 
-        <!-- APP 2: TRÌNH DUYỆT FIREFOX (Đã sửa lỗi kết nối bằng web vẽ tranh không chặn iframe) -->
-        <div id="browser-window" class="window hidden" style="width: 750px; height: 480px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots">
-                    <span class="dot close" onclick="closeWindow('browser-window')"></span>
-                    <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
-                    <span class="dot maximize"></span>
-                </div>
-                <div class="window-title">Firefox Web Browser (Paint App)</div>
-            </div>
-            <div class="window-body" style="padding: 0;">
-                <iframe src="https://js.org" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
-            </div>
+        <!-- APP 2: TRÌNH DUYỆT FIREFOX (Nhúng Game từ Itch.io) -->
+<div id="browser-window" class="window hidden" style="width: 750px; height: 500px;">
+    <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
+        <div class="window-dots">
+            <span class="dot close" onclick="closeWindow('browser-window')"></span>
+            <span class="dot minimize" onclick="closeWindow('browser-window')"></span>
+            <span class="dot maximize"></span>
         </div>
+        <div class="window-title">Firefox Web Browser (Itch.io Game)</div>
+    </div>
+    <div class="window-body" style="padding: 0; background: #000;">
+        <!-- Nhúng link trực tiếp từ server embed của itch.io để không bị lỗi mặt buồn -->
+        <iframe src="https://itch.io" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+</div>
 
         <!-- APP 3: TRÌNH QUẢN LÝ TỆP TIN (Files Manager) -->
         <div id="files-window" class="window hidden" style="width: 520px; height: 360px;">
