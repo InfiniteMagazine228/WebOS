@@ -1,4 +1,3 @@
-/* Khởi tạo hệ thống */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -10,25 +9,15 @@
 body {
     width: 100vw;
     height: 100vh;
+    background: linear-gradient(135deg, #77216F 0%, #5E2750 50%, #E95420 100%);
     background-size: cover;
-    background-position: center;
     overflow: hidden;
-    transition: background 0.3s ease;
 }
 
-/* Các lớp CSS đại diện cho 4 bộ hình nền khác nhau */
-body.wp1 { background: linear-gradient(135deg, #77216F 0%, #5E2750 50%, #E95420 100%); }
-body.wp2 { background: linear-gradient(135deg, #111827 0%, #1F2937 100%); }
-body.wp3 { background: linear-gradient(135deg, #065F46 0%, #064E3B 100%); }
-body.wp4 { background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%); }
-
-/* Mặc định chạy hình nền Ubuntu truyền thống */
-body:not([class]) { background: linear-gradient(135deg, #77216F 0%, #5E2750 50%, #E95420 100%); }
-
-/* Thanh Top Bar mờ kính */
+/* Top bar mờ kính */
 .top-bar {
     height: 28px;
-    background: rgba(16, 16, 16, 0.65);
+    background: rgba(16, 16, 16, 0.7);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     color: #dfdbd2;
@@ -38,201 +27,163 @@ body:not([class]) { background: linear-gradient(135deg, #77216F 0%, #5E2750 50%,
     padding: 0 15px;
     font-size: 13px;
     font-weight: 500;
-    z-index: 99999;
+    z-index: 999999;
     position: relative;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.top-bar .right i { margin-left: 14px; cursor: pointer; }
 
-/* Ubuntu Left Dock (ĐÃ THÊM OVERFLOW ĐỂ KHÔNG BỊ TRÀN TRÊN ITCH.IO) */
+/* Dòng chỉ dẫn phím tắt */
+.shortcut-tip {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 11px;
+    border-radius: 4px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* Sửa lỗi tràn thanh ứng dụng bên trái */
 .side-dock {
     position: absolute;
     left: 6px;
     top: 36px;
     bottom: 6px;
-    width: 58px;
-    background: rgba(16, 16, 16, 0.45);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 10px;
+    width: 54px;
+    background: rgba(16, 16, 16, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 12px;
-    z-index: 9999;
+    padding: 10px 0;
+    z-index: 99999;
     border: 1px solid rgba(255,255,255,0.08);
-    
-    /* Thuộc tính cốt lõi chặn đứng lỗi tràn */
     overflow-y: auto;
-    scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+    scrollbar-width: none;
 }
-.side-dock::-webkit-scrollbar { display: none; } /* Ẩn thanh cuộn trên Chrome/Safari */
+.side-dock::-webkit-scrollbar { display: none; }
 
+/* Định hình chuẩn cho hộp chứa Icon */
 .dock-item {
-    width: 44px;
-    height: 44px;
-    margin-bottom: 12px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
     border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 22px;
     color: #ffffff;
     cursor: pointer;
     position: relative;
-    flex-shrink: 0; /* Ngăn không cho icon bị bóp méo khi màn hình nhỏ */
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+    transition: transform 0.15s ease, background 0.15s;
+    flex-shrink: 0;
 }
-.dock-item i { display: block !important; }
-.dock-item:hover { transform: scale(1.18); background: rgba(233, 84, 32, 0.4); }
 
-/* Tooltip trên thanh dock */
+/* Ép kích thước SVG vẽ chuẩn icon */
+.dock-item svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+.dock-item:hover {
+    transform: scale(1.12);
+    background: rgba(233, 84, 32, 0.45);
+}
+
 .dock-item .tooltip {
     position: absolute;
-    left: 68px;
-    background: rgba(10, 10, 10, 0.9);
-    padding: 5px 10px;
-    border-radius: 5px;
+    left: 62px;
+    background: rgba(15,15,15,0.95);
+    padding: 4px 8px;
+    border-radius: 4px;
     font-size: 11px;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.15s;
+    transition: opacity 0.1s;
     white-space: nowrap;
     border: 1px solid rgba(255,255,255,0.1);
 }
 .dock-item:hover .tooltip { visibility: visible; opacity: 1; }
-.settings-icon { margin-top: auto; margin-bottom: 15px; }
+.settings-icon { margin-top: auto; margin-bottom: 5px; }
 
-/* Desktop Workspace */
-.desktop { position: absolute; top: 28px; left: 70px; right: 0; bottom: 0; }
+.desktop { position: absolute; top: 28px; left: 66px; right: 0; bottom: 0; }
 
-/* Định dạng Cửa sổ Ứng dụng */
+/* Kiến trúc cửa sổ */
 .window {
     position: absolute;
-    background: rgba(35, 35, 35, 0.9);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
+    background: rgba(30, 30, 30, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.55);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     z-index: 10;
-    /* Hiệu ứng mượt mà tăng tốc phần cứng */
-    will-change: transform, top, left, width, height;
-    transition: top 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
-                left 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
-                width 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
-                height 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-    animation: zoomIn 0.22s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: zoomIn 0.18s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+@keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.window.closing { animation: zoomOut 0.15s ease-in forwards; }
+@keyframes zoomOut { to { transform: scale(0.9); opacity: 0; } }
+.hidden { display: none !important; }
 
-/* Lớp bổ sung xử lý khi bấm nút Phóng to toàn màn hình */
+/* Trạng thái Phóng To Toàn Màn Hình */
 .window.maximized {
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    border-radius: 0px !important;
+    border-radius: 0;
+    border: none;
 }
 
-@keyframes zoomIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.window.closing { animation: zoomOut 0.15s ease-in forwards; }
-@keyframes zoomOut { to { transform: scale(0.88); opacity: 0; } }
-.hidden { display: none !important; }
-
-/* Thanh điều khiển Gtk Header */
 .window-header {
-    height: 36px;
-    background: #232323;
+    height: 34px;
+    background: #242424;
     display: flex;
     align-items: center;
-    padding: 0 14px;
+    padding: 0 12px;
     cursor: move;
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-    flex-shrink: 0;
 }
-.window-dots { display: flex; gap: 8px; }
-.dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
+.window-dots { display: flex; gap: 7px; }
+.dot { width: 11px; height: 11px; border-radius: 50%; cursor: pointer; }
 .dot.close { background: #EF4444; }
 .dot.minimize { background: #F59E0B; }
 .dot.maximize { background: #10B981; }
-.window-title { color: #e6e6e6; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.window-title { color: #d0d0d0; font-size: 13px; text-align: center; flex-grow: 1; margin-right: 45px; font-weight: 500;}
 .window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
-/* CSS App 1: Terminal */
-.terminal-body { background: #1C131A; padding: 12px; font-family: 'Courier New', monospace; overflow-y: auto;}
-.terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.4; }
-.terminal-input-line { display: flex; align-items: center; color: #dfdbd2; font-size: 13px;}
+/* Terminal */
+.terminal-body { background: #190F14; padding: 10px; font-family: monospace; overflow-y: auto; }
+.terminal-text { margin-bottom: 5px; font-size: 13px; line-height: 1.4; color: #fff; }
+.terminal-input-line { display: flex; align-items: center; font-size: 13px; }
 .terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: monospace; font-size: 13px; flex-grow: 1; }
 
-/* CSS App 2: Firefox Nav Bar */
-.browser-nav-bar {
-    background: #38383D;
-    padding: 6px 12px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    border-bottom: 1px solid #2B2A2F;
-    flex-shrink: 0;
-}
-.nav-arrows { color: #aaa; display: flex; gap: 14px; font-size: 13px; cursor: pointer; }
-.url-input-box { flex-grow: 1; background: #1C1B22; border-radius: 4px; padding: 4px 10px; color: #bbb; font-size: 12px; display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
-.quick-bookmarks { display: flex; gap: 6px; }
-.quick-bookmarks button { background: #4B4B52; border: none; color: #fff; padding: 4px 10px; border-radius: 3px; font-size: 11px; cursor: pointer; transition: background 0.2s;}
-.quick-bookmarks button:hover { background: #E95420; }
+/* Files Manager */
+.files-body { display: flex; background: #2D2D2D; }
+.files-sidebar { width: 120px; background: #383838; padding-top: 10px; border-right: 1px solid #1a1a1a; }
+.files-sidebar div { padding: 8px 12px; font-size: 12px; cursor: pointer; color: #ccc; }
+.files-sidebar div.active, .files-sidebar div:hover { background: #E95420; color: #fff; }
+.files-content { flex-grow: 1; padding: 15px; display: flex; gap: 15px; flex-wrap: wrap; align-content: flex-start; }
+.file-icon { display: flex; flex-direction: column; align-items: center; width: 60px; cursor: pointer; text-align: center; font-size: 28px; }
+.file-icon span { font-size: 11px; margin-top: 4px; color: #e0e0e0; }
 
-/* CSS App 3: Text Editor */
-.notepad-textarea {
-    width: 100%;
-    height: 100%;
-    background: #272727;
-    border: none;
-    outline: none;
-    color: #f3f4f6;
-    padding: 12px;
-    font-size: 14px;
-    line-height: 1.5;
-    resize: none;
-}
-
-/* CSS App 4: Files Manager */
-.files-body { display: flex; padding: 0 !important; background: #2F2F2F; }
-.files-sidebar { width: 130px; background: #3A3A3A; padding-top: 15px; border-right: 1px solid #222; flex-shrink: 0;}
-.files-sidebar div { padding: 10px 15px; font-size: 13px; cursor: pointer; color: #ccc; }
-.files-sidebar div:hover, .files-sidebar div.active { background: #E95420; color: white; }
-.files-sidebar div i { margin-right: 8px; }
-.files-content { flex-grow: 1; padding: 15px; display: flex; gap: 20px; flex-wrap: wrap; align-content: flex-start; overflow-y: auto;}
-.file-icon { display: flex; flex-direction: column; align-items: center; width: 65px; cursor: pointer; text-align: center; }
-.file-icon i { font-size: 36px; color: #F59E0B; margin-bottom: 6px; }
-.file-icon i.fa-file-code { color: #60A5FA; }
-.file-icon i.fa-file-alt { color: #9CA3AF; }
-.file-icon span { font-size: 12px; word-break: break-all; color: #e5e7eb; }
-
-/* CSS App 5: Music Player */
-.music-body { background: #1E1E1E; display: flex; align-items: center; padding: 20px; gap: 20px; }
-.music-body i.fa-compact-disc { font-size: 60px; color: #E95420; }
-.music-info h4 { margin-bottom: 4px; color: #fff; font-size: 16px;}
-.music-info p { font-size: 12px; color: #aaa; margin-bottom: 15px;}
-.music-controls { display: flex; gap: 20px; font-size: 20px; cursor: pointer; }
-.music-controls i:hover { color: #E95420; }
+/* Music Player */
+.music-body { background: #1A1A1A; display: flex; align-items: center; padding: 20px; gap: 20px; }
+.music-info h4 { margin: 0; color: #fff; }
+.music-controls span { font-size: 18px; margin-right: 15px; cursor: pointer; }
 .disc-anime { animation: spin 4s linear infinite; animation-play-state: paused; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* CSS App 6: Settings */
-.about-body { display: flex; flex-direction: column; align-items: center; padding: 15px; text-align: center; gap: 10px; background: #2A2A2A; overflow-y: auto;}
-.about-body h3 { color: #E95420; font-size: 16px; margin-top: 2px;}
-.about-body p { font-size: 13px; color: #bbb; }
-.about-body button { background: #E95420; border: none; color: white; padding: 6px 18px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-.about-body button:hover { background: #c64113; }
-
-.wallpaper-section { width: 100%; border-top: 1px solid #444; padding-top: 12px; margin-top: 5px; text-align: left; }
-.wallpaper-section h4 { font-size: 13px; color: #e5e7eb; margin-bottom: 8px; font-weight: 500;}
-.wallpaper-grid { display: flex; gap: 10px; justify-content: space-between; }
-.wp-thumb { width: 22%; height: 50px; border-radius: 4px; border: 2px solid transparent; cursor: pointer; transition: border 0.2s; }
-.wp-thumb:hover { border-color: #E95420; }
-.wp-thumb.wp1 { background: linear-gradient(135deg, #77216F 0%, #E95420 100%); }
-.wp-thumb.wp2 { background: linear-gradient(135deg, #111827 0%, #1F2937 100%); }
-.wp-thumb.wp3 { background: linear-gradient(135deg, #065F46 0%, #064E3B 100%); }
-.wp-thumb.wp4 { background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%); }
+/* About Screen */
+.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; background: #252525; padding: 20px;}
+.about-body h3 { color: #E95420; font-size: 16px; }
+.about-body p { font-size: 12px; color: #aaa; }
+.about-body button { background: #E95420; border: none; color: white; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 5px;}
