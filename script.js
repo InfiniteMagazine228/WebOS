@@ -1,4 +1,4 @@
-// 1. Cập nhật đồng hồ Top Bar theo thời gian thực
+// 1. Đồng hồ thời gian thực thanh trạng thái
 function updateClock() {
     const clockElement = document.getElementById('live-clock');
     const now = new Date();
@@ -7,17 +7,18 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// 2. Mở / Đóng cửa sổ và cơ chế đưa cửa sổ lên trên cùng
+// 2. Cơ chế Mở / Đóng và Đè cửa sổ ứng dụng (Z-Index)
 let topZIndex = 100;
+let windowPositions = {}; // Lưu trữ vị trí cũ trước khi phóng to toàn màn hình
 
 function openWindow(id) {
     const win = document.getElementById(id);
     win.classList.remove('hidden', 'closing');
     
-    // Tự động sắp xếp lệch nhau một chút để các ứng dụng không bị đè khít hoàn toàn lên nhau
-    if (!win.style.top) {
-        win.style.top = (60 + Math.random() * 60) + "px";
-        win.style.left = (80 + Math.random() * 80) + "px";
+    // Tự động căn tọa độ ban đầu lệch nhau một chút để giao diện thoáng
+    if (!win.style.top && !win.classList.contains('maximized')) {
+        win.style.top = (50 + Math.random() * 50) + "px";
+        win.style.left = (70 + Math.random() * 70) + "px";
     }
     
     bringToFront(win);
@@ -28,7 +29,7 @@ function closeWindow(id) {
     win.classList.add('closing');
     setTimeout(() => {
         win.classList.add('hidden');
-    }, 180);
+    }, 150);
 }
 
 function bringToFront(clickedWindow) {
@@ -36,9 +37,37 @@ function bringToFront(clickedWindow) {
     clickedWindow.style.zIndex = topZIndex;
 }
 
-// 3. Cơ chế kéo thả các cửa sổ Gtk Linux mượt mà
+// TÍNH NĂNG MỚI: Phóng to (Maximize) toàn màn hình và khôi phục kích cỡ cũ
+function toggleMaximize(id) {
+    const win = document.getElementById(id);
+    if (win.classList.contains('maximized')) {
+        win.classList.remove('maximized');
+        // Khôi phục lại tọa độ cũ trước khi phóng to
+        if (windowPositions[id]) {
+            win.style.top = windowPositions[id].top;
+            win.style.left = windowPositions[id].left;
+            win.style.width = windowPositions[id].width;
+            win.style.height = windowPositions[id].height;
+        }
+    } else {
+        // Lưu lại vị trí hiện tại của app trước khi bung to rộng
+        windowPositions[id] = {
+            top: win.style.top,
+            left: win.style.left,
+            width: win.style.width,
+            height: win.style.height
+        };
+        win.classList.add('maximized');
+    }
+}
+
+// 3. Cơ chế xử lý Kéo - Thả cửa sổ
 function dragElement(header, event) {
     const targetElement = header.parentElement;
+    
+    // Nếu cửa sổ đang bung full màn hình thì cấm không cho kéo đi lung tung
+    if (targetElement.classList.contains('maximized')) return;
+
     bringToFront(targetElement);
 
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -57,7 +86,7 @@ function dragElement(header, event) {
         let newTop = targetElement.offsetTop - pos2;
         let newLeft = targetElement.offsetLeft - pos1;
 
-        if (newTop < 28) newTop = 28; // Giới hạn không cho lọt lên trên Topbar
+        if (newTop < 28) newTop = 28; // Giới hạn không cho kẹt trên thanh Top bar
 
         targetElement.style.top = newTop + "px";
         targetElement.style.left = newLeft + "px";
@@ -69,65 +98,7 @@ function dragElement(header, event) {
     }
 }
 
-// 4. Logic trình nghe nhạc Ubuntu (Music Player)
-const audio = document.getElementById('bg-music');
-const playBtn = document.getElementById('play-btn');
-const disc = document.querySelector('.disc-anime');
-
-function toggleMusic() {
-    if (audio.paused) {
-        audio.play().catch(err => console.log("Cần click chuột vào web trước để kích hoạt phát nhạc công khai"));
-        playBtn.className = "fas fa-pause";
-        disc.style.animationPlayState = "running";
-    } else {
-        audio.pause();
-        playBtn.className = "fas fa-play";
-        disc.style.animationPlayState = "paused";
-    }
-}
-
-// 5. Trình xử lý câu lệnh hệ thống Terminal Linux
-const terminalInput = document.getElementById('terminal-input');
-if(terminalInput) {
-    terminalInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const command = this.value.trim().toLowerCase();
-            const body = this.parentElement.parentElement;
-            
-            const oldLine = document.createElement('p');
-            oldLine.className = 'terminal-text';
-            oldLine.innerHTML = `ubuntu@webos:~$ ${this.value}`;
-            body.insertBefore(oldLine, this.parentElement);
-
-            const responseLine = document.createElement('p');
-            responseLine.className = 'terminal-text';
-
-            if (command === 'help') {
-                responseLine.innerHTML = "Lệnh khả dụng: <br>- <span style='color:#50fa7b'>neofetch</span>: Xem cấu hình hệ điều hành<br>- <span style='color:#8be9fd'>ls</span>: Xem danh sách các file tệp tin<br>- <span style='color:#ff79c6'>clear</span>: Xóa sạch màn hình dòng lệnh";
-            } else if (command === 'neofetch') {
-                responseLine.innerHTML = `
-                    <span style='color:#e95420'><b>OS:</b></span> Ubuntu WebOS v2.5 Linux<br>
-                    <span style='color:#e95420'><b>Host:</b></span> Vercel Cloud Server<br>
-                    <span style='color:#e95420'><b>Kernel:</b></span> Browser JavaScript V8 Engine<br>
-                    <span style='color:#e95420'><b>DE:</b></span> GNOME Web Shell`;
-            } else if (command === 'ls') {
-                responseLine.innerHTML = "<span style='color:#60A5FA'>Projects/</span> &nbsp;&nbsp; <span style='color:#60A5FA'>Photos/</span> &nbsp;&nbsp; kernel.c &nbsp;&nbsp; README.txt";
-            } else if (command === 'clear') {
-                const textLines = body.querySelectorAll('.terminal-text');
-                textLines.forEach(line => line.remove());
-                this.value = '';
-                return;
-            } else if (command !== "") {
-                responseLine.innerHTML = `bash: không tìm thấy lệnh: ${command}. Gõ 'help' để xem danh sách lệnh.`;
-                responseLine.style.color = '#ff5555';
-            }
-
-            if(command !== "") {
-                body.insertBefore(responseLine, this.parentElement);
-            }
-
-            this.value = '';
-            body.scrollTop = body.scrollHeight; 
-        }
-    });
-}
+// TÍNH NĂNG MỚI: Cơ chế đổi trang và cập nhật thanh URL của trình duyệt Firefox
+function changeWebPage(url, title) {
+    document.getElementById('browser-iframe').src = url;
+    
