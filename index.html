@@ -87,14 +87,38 @@
         </div>
 
         <!-- CÁC CỬA SỔ ỨNG DỤNG ĐỂ APT TỰ ĐỘNG KÍCH HOẠT KHI CÀI ĐẶT -->
-        <!-- App Firefox Browser -->
+                <!-- APP: FIREFOX BROWSER GIẢ LẬP (ĐÃ ĐỔI SANG SEARCH GOOGLE) -->
         <div id="firefox-window" class="window hidden" style="width: 750px; height: 480px; top: 50px; left: 150px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots"><span class="dot close" onclick="closeWindow('firefox-window')"></span><span class="dot minimize" onclick="closeWindow('firefox-window')"></span><span class="dot maximize" onclick="toggleMaximize('firefox-window')"></span></div>
+                <div class="window-dots">
+                    <span class="dot close" onclick="closeWindow('firefox-window')"></span>
+                    <span class="dot minimize" onclick="closeWindow('firefox-window')"></span>
+                    <span class="dot maximize" onclick="toggleMaximize('firefox-window')"></span>
+                </div>
                 <div class="window-title">Firefox Web Browser</div>
             </div>
-            <div class="window-body" style="padding:0; background:#fff;"><iframe src="https://google.com" style="width:100%; height:100%; border:none;"></iframe></div>
+            
+            <!-- Thanh địa chỉ URL giả lập hiển thị google.com cho giống thật -->
+            <div style="background: #38383D; padding: 6px 10px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #2B2A2F;">
+                <div style="color: #aaa; display: flex; gap: 12px; font-size: 13px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                </div>
+                <div style="flex-grow: 1; background: #1C1B22; border-radius: 4px; padding: 4px 10px; color: #fff; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="text" value="https://google.com" style="background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 12px;" readonly>
+                </div>
+            </div>
+
+            <!-- Khung ruột ứng dụng nạp ô tìm kiếm nhúng của Google -->
+            <div class="window-body" style="padding:0; background:#fff; height: calc(100% - 72px);">
+                <iframe src="https://google.com" style="display:none;"></iframe>
+                <!-- Link nhúng form tìm kiếm tùy biến từ Custom Search Engine của Google -->
+                <iframe src="https://google.com/webhp?igu=1" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
+            </div>
         </div>
+
 
         <!-- App Game DOOM Classic (Sử dụng link js-dos không bao giờ bị từ chối kết nối iframe) -->
         <div id="doom-window" class="window hidden" style="width: 680px; height: 450px; top: 60px; left: 180px;">
