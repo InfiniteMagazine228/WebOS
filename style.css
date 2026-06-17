@@ -1,9 +1,10 @@
-/* Reset css và sửa lỗi tràn của dock */
+/* Tối ưu hóa giao diện và sửa lỗi click chuột trên Dock */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Ubuntu, sans-serif;
+    user-select: none;
 }
 
 body {
@@ -14,7 +15,7 @@ body {
     overflow: hidden;
 }
 
-/* Khung thông báo góc phải giống Ubuntu shell thật */
+/* Khung thông báo góc phải hệ thống */
 .toast {
     position: fixed;
     top: 40px;
@@ -28,44 +29,43 @@ body {
     z-index: 999999;
     padding: 12px;
     backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
-    transform: translateY(0);
+    transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 .toast.hidden {
     opacity: 0;
-    transform: translateY(-30px);
+    transform: translateY(-20px);
     pointer-events: none;
 }
-.toast-header { font-weight: bold; color: #e95420; margin-bottom: 5px; font-size: 13px;}
-.toast-body { font-size: 13px; color: #ddd; }
+.toast-header { display: flex; align-items: center; font-weight: bold; font-size: 13px;}
+.toast-body { font-size: 12px; color: #ccc; margin-top: 5px; }
 
 /* Top Bar */
 .top-bar {
     height: 28px;
     background: rgba(16, 16, 16, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     color: #dfdbd2;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 15px;
     font-size: 13px;
-    z-index: 99999;
+    z-index: 9999;
     position: relative;
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .top-bar .left { cursor: pointer; }
-.top-bar .right i { margin-left: 14px; cursor: pointer; }
+.top-bar .right svg { cursor: pointer; }
 
-/* Ubuntu Left Dock - FIX TRÀN & NỔI BẬT ICON */
+/* FIXED LINUX DOCK - NẠP SẮC NÉT ICON SVG */
 .side-dock {
     position: absolute;
     left: 8px;
     top: 36px;
     bottom: 8px;
     width: 60px;
-    background: rgba(16, 16, 16, 0.5);
+    background: rgba(16, 16, 16, 0.55);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 12px;
@@ -73,12 +73,11 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 12px 0;
-    z-index: 9999;
+    z-index: 99999; /* Đẩy dock lên trên cùng không cho bất kỳ thuộc tính nào che khuất chuột */
     border: 1px solid rgba(255,255,255,0.1);
     gap: 12px;
 }
 
-/* Thao tác ép icon Font-Awesome luôn xuất hiện sắc nét */
 .dock-item {
     width: 44px;
     height: 44px;
@@ -86,30 +85,27 @@ body {
     display: flex !important;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
-    position: relative;
-    background: rgba(255,255,255,0.05);
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+    cursor: pointer !important;
+    background: rgba(255,255,255,0.06);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto !important; /* Mở khóa phản hồi nút chuột chuột */
 }
-.dock-item i {
-    color: #ffffff !important;
-    font-size: 20px !important;
-    display: block !important;
+.dock-item svg {
     pointer-events: none;
 }
 .dock-item:hover {
     transform: scale(1.15);
     background: #e95420 !important;
-    box-shadow: 0 5px 15px rgba(233, 84, 32, 0.4);
+    box-shadow: 0 4px 12px rgba(233, 84, 32, 0.4);
 }
 
-/* Tooltip trên dock */
+/* Tooltip */
 .dock-item .tooltip {
     position: absolute;
-    left: 70px;
+    left: 68px;
     background: #111;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 11px;
     color: #fff;
     visibility: hidden;
@@ -122,10 +118,10 @@ body {
 .dock-item:hover .tooltip { visibility: visible; opacity: 1; }
 .settings-icon { margin-top: auto; }
 
-/* Desktop */
-.desktop { position: absolute; top: 28px; left: 76px; right: 0; bottom: 0; }
+/* Desktop Workspace */
+.desktop { position: absolute; top: 28px; left: 76px; right: 0; bottom: 0; z-index: 1; }
 
-/* Các cửa sổ ứng dụng */
+/* Cấu trúc Cửa sổ Gnome */
 .window {
     position: absolute;
     background: rgba(30, 30, 30, 0.85);
@@ -133,7 +129,7 @@ body {
     -webkit-backdrop-filter: blur(25px);
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.55);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -148,7 +144,7 @@ body {
     border-radius: 0;
 }
 
-/* Thanh điều hướng Gtk Header */
+/* Header */
 .window-header {
     height: 36px;
     background: #232323;
@@ -159,21 +155,20 @@ body {
     border-bottom: 1px solid rgba(0,0,0,0.3);
 }
 .window-dots { display: flex; gap: 8px; }
-.dot { width: 13px; height: 13px; border-radius: 50%; cursor: pointer; }
+.dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
 .dot.close { background: #EF4444; }
 .dot.minimize { background: #F59E0B; }
 .dot.maximize { background: #10B981; }
-.window-title { color: #ddd; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+.window-title { color: #ddd; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; }
 .window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
-/* Terminal Layout */
-.terminal-body { background: #1C131A; padding: 15px; font-family: 'Courier New', monospace; overflow-y: auto; text-shadow: none;}
+/* Terminal Style */
+.terminal-body { background: #1C131A; padding: 15px; font-family: 'Courier New', monospace; overflow-y: auto; }
 .terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.5; font-family: 'Courier New', monospace; }
-.terminal-input-line { display: flex; align-items: center; font-size: 13px; color: #50fa7b;}
+.terminal-input-line { display: flex; align-items: center; font-size: 13px; color: #50fa7b; }
 .terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: 'Courier New', monospace; font-size: 13px; flex-grow: 1; }
 
-/* CSS phụ cho About */
-.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 12px; background: #2A2A2A;}
-.ubuntu-btn { background: #E95420; border: none; color: white; padding: 8px 24px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
+/* About Panel */
+.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 12px; background: #2A2A2A; }
+.ubuntu-btn { background: #E95420; border: none; color: white; padding: 8px 24px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
 .ubuntu-btn:hover { background: #c64113; }
-kbd { background: #444; padding: 2px 6px; border-radius: 4px; font-size: 11px; border: 1px solid #666;}
