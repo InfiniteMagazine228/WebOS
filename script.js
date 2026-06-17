@@ -189,11 +189,11 @@ function executeInstallSuccess(pkgId) {
     mainDock.insertBefore(newDockItem, document.getElementById('dock-about'));
 }
 
-// Ghi đè đoạn logic sự kiện keydown dưới cùng của script.js để chơi game không bị kẹt phím
+// 6. HỆ THỐNG PHÍM TẮT ĐA NHIỆM THÔNG MINH (ĐÃ FIX LỖI KẸT PHÍM GAME)
 window.addEventListener('keydown', function(e) {
-    // Nếu người dùng đang tập trung gõ lệnh trong Terminal hoặc đang chơi game Minecraft thì tạm dừng phím tắt hệ thống WebOS
+    // Nếu người dùng đang bấm vào trong khung game Minecraft hoặc ô nhập lệnh thì nhường phím cho game/input
     if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'IFRAME') {
-        return; // Cho phép phím truyền thẳng vào game
+        return; 
     }
 
     const isModifier = e.altKey || e.metaKey; 
