@@ -44,29 +44,25 @@
     <!-- Không gian màn hình Desktop chứa cửa sổ -->
     <div class="desktop" id="desktop-area">
 
-        <!-- CỬA SỔ TERMINAL LINUX -->
-        <div id="terminal-window" class="window" style="width: 580px; height: 380px; top: 70px; left: 110px;">
+                <!-- APP 1: TERMINAL LINUX THẬT (BẢN VÁ LINK MÁY ẢO WASM CHUẨN) -->
+        <div id="terminal-window" class="window" style="width: 720px; height: 450px; top: 70px; left: 110px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('terminal-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('terminal-window')"></span>
                     <span class="dot maximize" onclick="toggleMaximize('terminal-window')"></span>
                 </div>
-                <div class="window-title">ubuntu@webos: ~</div>
+                <div class="window-title">ubuntu@kernel: ~</div>
             </div>
-            <div class="window-body terminal-body" onclick="document.getElementById('terminal-input').focus()">
-                <p class="terminal-text">Welcome to Ubuntu Linux WebOS v6.5!</p>
-                <p class="terminal-text" style="color:#8be9fd;">Hệ thống lõi APT hoàn chỉnh. Hãy thử gõ các lệnh sau:</p>
-                <p class="terminal-text">-> <span style="color: #f1fa8c;">sudo apt install firefox</span> (Cài trình duyệt Google)</p>
-                <p class="terminal-text">-> <span style="color: #f1fa8c;">sudo apt install minecraft</span> (Cài game Minecraft WASM)</p>
-                <p class="terminal-text">-> <span style="color: #ff5555;">sudo apt remove minecraft</span> (Gỡ cài đặt ứng dụng)</p>
-                <div id="terminal-history"></div>
-                <div class="terminal-input-line">
-                    <span>ubuntu@webos:~$ &nbsp;</span>
-                    <input type="text" id="terminal-input" autofocus autocomplete="off">
-                </div>
+            <div class="window-body" style="padding: 0; background: #000; height: calc(100% - 36px); width: 100%;">
+                <!-- Link máy ảo Linux Buildroot chạy trực tiếp bằng Javascript/WASM cực mượt và ổn định -->
+                <iframe src="https://copy.sh/v86/debug.html?profile=tinycore" 
+                        allowfullscreen="true"
+                        style="width: 100%; height: 100%; border: none; display: block;">
+                </iframe>
             </div>
         </div>
+
 
         <!-- CỬA SỔ ABOUT SYSTEM -->
         <div id="about-window" class="window hidden" style="width: 420px; height: 260px; top: 120px; left: 200px;">
