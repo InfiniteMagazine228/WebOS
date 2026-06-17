@@ -1,9 +1,9 @@
+/* Thiết lập cấu trúc lõi ứng dụng */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Ubuntu, sans-serif;
-    user-select: none;
 }
 
 body {
@@ -14,12 +14,12 @@ body {
     overflow: hidden;
 }
 
-/* Top bar mờ kính */
+/* Khung Top Bar mờ kính */
 .top-bar {
     height: 28px;
     background: rgba(16, 16, 16, 0.7);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     color: #dfdbd2;
     display: flex;
     justify-content: space-between;
@@ -31,28 +31,17 @@ body {
     position: relative;
     border-bottom: 1px solid rgba(255,255,255,0.06);
 }
+.top-bar .left { cursor: pointer; padding: 2px 8px; border-radius: 4px; }
+.top-bar .left:hover { background: rgba(255,255,255,0.1); }
+.top-bar .right i { margin-left: 14px; cursor: pointer; }
 
-/* Dòng chỉ dẫn phím tắt */
-.shortcut-tip {
-    position: absolute;
-    bottom: 8px;
-    right: 12px;
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-    padding: 5px 10px;
-    font-size: 11px;
-    border-radius: 4px;
-    z-index: 9999;
-    pointer-events: none;
-}
-
-/* Sửa lỗi tràn thanh ứng dụng bên trái */
+/* SỬA LỖI TRÀN DOCK: Dock thông minh tự động co giãn */
 .side-dock {
     position: absolute;
-    left: 6px;
+    left: 8px;
     top: 36px;
-    bottom: 6px;
-    width: 54px;
+    bottom: 8px;
+    width: 58px;
     background: rgba(16, 16, 16, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -60,130 +49,127 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px 0;
+    padding: 12px 0;
     z-index: 99999;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
     overflow-y: auto;
-    scrollbar-width: none;
+    scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
 }
-.side-dock::-webkit-scrollbar { display: none; }
+.side-dock::-webkit-scrollbar { display: none; } /* Ẩn thanh cuộn Chrome/Safari */
 
-/* Định hình chuẩn cho hộp chứa Icon */
 .dock-item {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    display: flex;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    display: flex !important;
     justify-content: center;
     align-items: center;
+    font-size: 20px;
     color: #ffffff;
     cursor: pointer;
     position: relative;
-    transition: transform 0.15s ease, background 0.15s;
     flex-shrink: 0;
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.25), background 0.15s;
 }
+.dock-item i { display: block !important; pointer-events: none; }
+.dock-item:hover { transform: scale(1.15); background: rgba(233, 84, 32, 0.45); }
 
-/* Ép kích thước SVG vẽ chuẩn icon */
-.dock-item svg {
-    width: 24px;
-    height: 24px;
-    display: block;
-}
-
-.dock-item:hover {
-    transform: scale(1.12);
-    background: rgba(233, 84, 32, 0.45);
-}
-
+/* Tooltip */
 .dock-item .tooltip {
     position: absolute;
-    left: 62px;
-    background: rgba(15,15,15,0.95);
-    padding: 4px 8px;
-    border-radius: 4px;
+    left: 68px;
+    background: rgba(20, 20, 20, 0.95);
+    padding: 6px 12px;
+    border-radius: 6px;
     font-size: 11px;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.1s;
+    transition: opacity 0.15s;
     white-space: nowrap;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.12);
 }
 .dock-item:hover .tooltip { visibility: visible; opacity: 1; }
-.settings-icon { margin-top: auto; margin-bottom: 5px; }
+.settings-icon { margin-top: auto; margin-bottom: 0px; }
 
-.desktop { position: absolute; top: 28px; left: 66px; right: 0; bottom: 0; }
+/* Desktop Workspace */
+.desktop { position: absolute; top: 28px; left: 0; right: 0; bottom: 0; z-index: 5; }
 
-/* Kiến trúc cửa sổ */
+/* Định dạng Cửa sổ */
 .window {
     position: absolute;
     background: rgba(30, 30, 30, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     z-index: 10;
-    animation: zoomIn 0.18s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    transform: scale(1);
+    opacity: 1;
+    transition: width 0.2s, height 0.2s, top 0.2s, left 0.2s;
 }
-@keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.window.closing { animation: zoomOut 0.15s ease-in forwards; }
-@keyframes zoomOut { to { transform: scale(0.9); opacity: 0; } }
-.hidden { display: none !important; }
+.window.hidden { display: none !important; }
+.window.maximized { width: 100vw !important; height: calc(100vh - 28px) !important; top: 0 !important; left: 0 !important; border-radius: 0; }
 
-/* Trạng thái Phóng To Toàn Màn Hình */
-.window.maximized {
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 0;
-    border: none;
-}
-
+/* Khung Header điều khiển cửa sổ */
 .window-header {
-    height: 34px;
+    height: 36px;
     background: #242424;
     display: flex;
     align-items: center;
-    padding: 0 12px;
+    padding: 0 14px;
     cursor: move;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+    user-select: none;
 }
-.window-dots { display: flex; gap: 7px; }
-.dot { width: 11px; height: 11px; border-radius: 50%; cursor: pointer; }
-.dot.close { background: #EF4444; }
-.dot.minimize { background: #F59E0B; }
-.dot.maximize { background: #10B981; }
-.window-title { color: #d0d0d0; font-size: 13px; text-align: center; flex-grow: 1; margin-right: 45px; font-weight: 500;}
+.window-dots { display: flex; gap: 8px; }
+.dot { width: 13px; height: 13px; border-radius: 50%; cursor: pointer; }
+.dot.close { background: #FF5555; }
+.dot.minimize { background: #FFB86C; }
+.dot.maximize { background: #50FA7B; }
+.window-title { color: #f8f8f2; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; pointer-events: none;}
 .window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
 /* Terminal */
-.terminal-body { background: #190F14; padding: 10px; font-family: monospace; overflow-y: auto; }
-.terminal-text { margin-bottom: 5px; font-size: 13px; line-height: 1.4; color: #fff; }
-.terminal-input-line { display: flex; align-items: center; font-size: 13px; }
+.terminal-body { background: #1E141B; padding: 14px; font-family: 'Courier New', monospace; overflow-y: auto; display: flex; flex-direction: column; }
+.terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.4; word-break: break-all;}
+.terminal-history { display: flex; flex-direction: column; }
+.terminal-input-line { display: flex; align-items: center; color: #f8f8f2; font-size: 13px; margin-top: auto; }
 .terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: monospace; font-size: 13px; flex-grow: 1; }
 
-/* Files Manager */
-.files-body { display: flex; background: #2D2D2D; }
-.files-sidebar { width: 120px; background: #383838; padding-top: 10px; border-right: 1px solid #1a1a1a; }
-.files-sidebar div { padding: 8px 12px; font-size: 12px; cursor: pointer; color: #ccc; }
-.files-sidebar div.active, .files-sidebar div:hover { background: #E95420; color: #fff; }
-.files-content { flex-grow: 1; padding: 15px; display: flex; gap: 15px; flex-wrap: wrap; align-content: flex-start; }
-.file-icon { display: flex; flex-direction: column; align-items: center; width: 60px; cursor: pointer; text-align: center; font-size: 28px; }
-.file-icon span { font-size: 11px; margin-top: 4px; color: #e0e0e0; }
+/* File Explorer App */
+.files-body { display: flex; background: #2D2D2D; height: 100%; }
+.files-sidebar { width: 130px; background: #383838; padding-top: 15px; border-right: 1px solid #1a1a1a; }
+.files-sidebar div { padding: 10px 15px; font-size: 13px; cursor: pointer; color: #ccc; }
+.files-sidebar div.active, .files-sidebar div:hover { background: #E95420; color: white; }
+.files-sidebar div i { margin-right: 8px; }
+.files-content { flex-grow: 1; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; align-content: flex-start; }
+.file-icon { display: flex; flex-direction: column; align-items: center; width: 65px; cursor: pointer; text-align: center; }
+.file-icon i { font-size: 38px; color: #FFB86C; margin-bottom: 6px; }
+.file-icon i.fa-file-code { color: #8be9fd; }
+.file-icon span { font-size: 12px; color: #f8f8f2; }
 
-/* Music Player */
-.music-body { background: #1A1A1A; display: flex; align-items: center; padding: 20px; gap: 20px; }
-.music-info h4 { margin: 0; color: #fff; }
-.music-controls span { font-size: 18px; margin-right: 15px; cursor: pointer; }
+/* Music Player App */
+.music-body { background: #212121; display: flex; align-items: center; padding: 25px; gap: 25px; height: 100%; }
+.music-body i.fa-compact-disc { font-size: 65px; color: #E95420; }
+.music-info h4 { margin-bottom: 4px; font-size: 16px; color: #fff;}
+.music-info p { font-size: 12px; color: #999; margin-bottom: 15px;}
+.music-controls { display: flex; gap: 22px; font-size: 22px; cursor: pointer; }
+.music-controls i:hover { color: #E95420; }
 .disc-anime { animation: spin 4s linear infinite; animation-play-state: paused; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
+/* Notification Center */
+.notification { position: absolute; top: 40px; right: 20px; width: 280px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); border-left: 5px solid #E95420; padding: 12px; border-radius: 6px; z-index: 9999999; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 13px; animation: slideIn 0.25s ease-out; }
+@keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
+
 /* About Screen */
-.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; background: #252525; padding: 20px;}
-.about-body h3 { color: #E95420; font-size: 16px; }
-.about-body p { font-size: 12px; color: #aaa; }
-.about-body button { background: #E95420; border: none; color: white; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 5px;}
+.about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; text-align: center; gap: 12px; height: 100%; background: #282828;}
+.about-body h3 { color: #E95420; font-size: 18px;}
+.about-body p { font-size: 13px; color: #bdc3c7; }
+.about-body button { margin-top: 8px; background: #E95420; border: none; color: white; padding: 8px 22px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.about-body button:hover { background: #b83d12; }
