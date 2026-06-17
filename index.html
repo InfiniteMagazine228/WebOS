@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ubuntu Linux WebOS v10.0 - Full APT Package System</title>
+    <title>Ubuntu Linux WebOS v10.0 - Fixed</title>
+    <!-- Nhúng CSS cốt lõi của WebOS -->
     <link rel="stylesheet" href="style.css">
-    <!-- Nạp engine terminal nội bộ Xterm.js để không bị vỡ giao diện menu xám -->
+    
+    <!-- ⚠️ HAI DÒNG QUAN TRỌNG NHẤT: Nạp thư viện giả lập dòng lệnh Xterm.js để fix lỗi đóng băng -->
     <link rel="stylesheet" href="https://cloudflare.com" />
     <script src="https://cloudflare.com"></script>
 </head>
 <body>
 
-    <!-- Khung thông báo hệ thống GNOME -->
+    <!-- Hệ thống thông báo nổi (Notification) -->
     <div id="notification-toast" class="toast hidden">
         <div class="toast-header">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e95420" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -32,7 +34,6 @@
 
     <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
     <div class="side-dock" id="main-dock">
-        <!-- Chỉ để duy nhất app Terminal mặc định khi khởi động -->
         <div class="dock-item" id="dock-terminal" onclick="openWindow('terminal-window')">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
             <span class="tooltip">Terminal (Win+T)</span>
@@ -43,19 +44,20 @@
         </div>
     </div>
 
-    <!-- Vùng không gian nền chứa các cửa sổ ứng dụng -->
+    <!-- Không gian màn hình Desktop chứa cửa sổ -->
     <div class="desktop" id="desktop-area">
 
-        <!-- CỬA SỔ TERMINAL NỘI BỘ XTERM -->
-        <div id="terminal-window" class="window" style="width: 720px; height: 440px; top: 70px; left: 110px;">
+        <!-- CỬA SỔ TERMINAL NATIVE XTERM (Đã sửa đổi id container nạp mượt mà) -->
+        <div id="terminal-window" class="window" style="width: 760px; height: 460px; top: 60px; left: 110px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('terminal-window')"></span>
                     <span class="dot minimize" onclick="closeWindow('terminal-window')"></span>
                     <span class="dot maximize" onclick="toggleMaximize('terminal-window')"></span>
                 </div>
-                <div class="window-title">ubuntu@apt-core: ~</div>
+                <div class="window-title">tc@tinycore-kernel: ~</div>
             </div>
+            <!-- Khung div chuẩn để Xterm nạp đồ họa dòng lệnh vào lòng trang web -->
             <div class="window-body terminal-integrated-body" id="xterm-container"></div>
         </div>
 
@@ -64,7 +66,7 @@
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('about-window')"></span>
-                    <span class="dot minimize" onclick="closeWindow('about-window')"></span>
+                    <span class="dot minimize" onclick="about-window")"></span>
                     <span class="dot maximize" onclick="toggleMaximize('about-window')"></span>
                 </div>
                 <div class="window-title">About Ubuntu WebOS</div>
@@ -72,37 +74,35 @@
             <div class="window-body about-body">
                 <img src="https://wikimedia.org" alt="Ubuntu Logo" width="55">
                 <h3>Ubuntu WebOS v10.0</h3>
-                <p>Mô phỏng nhân quản lý gói cài đặt nâng cao bằng Xterm Core Sandbox.</p>
+                <p>Hệ thống Terminal lõi kép, tự động bẫy câu lệnh gõ để nạp ứng dụng cục bộ.</p>
                 <button class="ubuntu-btn" onclick="closeWindow('about-window')">Đóng</button>
             </div>
         </div>
 
-        <!-- KHO CHỨA CẤU TRÚC APP SẴN SÀNG ĐỂ APT LẬP TRÌNH BUNG RA KHI CÀI ĐẶT -->
-        <!-- App VS Code -->
-        <div id="vscode-window" class="window hidden" style="width: 850px; height: 550px; top: 40px; left: 140px;">
+        <!-- CỬA SỔ FIREFOX BROWSER (Sẵn sàng kích hoạt bằng lệnh sudo apt install firefox) -->
+        <div id="firefox-window" class="window hidden" style="width: 760px; height: 500px; top: 50px; left: 150px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots"><span class="dot close" onclick="closeWindow('vscode-window')"></span><span class="dot minimize" onclick="closeWindow('vscode-window')"></span><span class="dot maximize" onclick="toggleMaximize('vscode-window')"></span></div>
-                <div class="window-title">Visual Studio Code</div>
+                <div class="window-dots"><span class="dot close" onclick="closeWindow('firefox-window')"></span><span class="dot minimize" onclick="closeWindow('firefox-window')"></span><span class="dot maximize" onclick="toggleMaximize('firefox-window')"></span></div>
+                <div class="window-title">Firefox Web Browser</div>
             </div>
-            <div class="window-body" style="padding:0;"><iframe src="https://vscode.dev" style="width:100%; height:100%; border:none;"></iframe></div>
+            <div style="background: #38383D; padding: 6px 10px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #2B2A2F;">
+                <div style="color: #aaa; display: flex; gap: 12px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></div>
+                <div style="flex-grow: 1; background: #1C1B22; border-radius: 4px; padding: 4px 10px; color: #fff; font-size: 11px; display: flex; align-items: center; gap: 8px;">
+                    <input type="text" value="https://google.com" style="background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 11px;" readonly>
+                </div>
+            </div>
+            <div class="window-body" style="padding:0; background:#fff; height: calc(100% - 72px);"><iframe src="https://google.com/webhp?igu=1" style="width:100%; height:100%; border:none; background:#fff;"></iframe></div>
         </div>
 
-        <!-- App Minecraft -->
-        <div id="minecraft-window" class="window hidden" style="width: 820px; height: 540px; top: 50px; left: 160px;">
+        <!-- CỬA SỔ MINECRAFT (Sẵn sàng kích hoạt bằng lệnh sudo apt install minecraft) -->
+        <div id="minecraft-window" class="window hidden" style="width: 820px; height: 540px; top: 60px; left: 180px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots"><span class="dot close" onclick="closeWindow('minecraft-window')"></span><span class="dot minimize" onclick="closeWindow('minecraft-window')"></span><span class="dot maximize" onclick="toggleMaximize('minecraft-window')"></span></div>
-                <div class="window-title">Minecraft Java 1.8.8</div>
+                <div class="window-title">Minecraft Java Edition v1.8.8 (Eaglercraft Cloud-WASM)</div>
             </div>
-            <div class="window-body" style="padding:0; background:#000;"><iframe src="https://eaglercraft.win" allowfullscreen="true" style="width: 100%; height: 100%; border: none; display: block;"></iframe></div>
-        </div>
-
-        <!-- App Discord -->
-        <div id="discord-window" class="window hidden" style="width: 840px; height: 520px; top: 60px; left: 150px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots"><span class="dot close" onclick="closeWindow('discord-window')"></span><span class="dot minimize" onclick="closeWindow('discord-window')"></span><span class="dot maximize" onclick="toggleMaximize('discord-window')"></span></div>
-                <div class="window-title">Discord Messenger</div>
+            <div class="window-body" style="padding:0; background:#000; height: calc(100% - 36px); width: 100%;">
+                <iframe src="https://eaglercraft.win" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" msallowfullscreen="true" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
             </div>
-            <div class="window-body" style="padding:0;"><iframe src="https://discord.com" style="width:100%; height:100%; border:none;"></iframe></div>
         </div>
 
     </div>
