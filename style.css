@@ -1,4 +1,3 @@
-/* Khởi tạo hệ thống cốt lõi */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -31,15 +30,11 @@ body {
     backdrop-filter: blur(15px);
     transition: all 0.2s ease-out;
 }
-.toast.hidden {
-    opacity: 0;
-    transform: translateY(-20px);
-    pointer-events: none;
-}
+.toast.hidden { opacity: 0; transform: translateY(-20px); pointer-events: none; }
 .toast-header { display: flex; align-items: center; font-size: 13px;}
-.toast-body { font-size: 12px; color: #ccc; margin-top: 6px; line-height: 1.4; }
+.toast-body { font-size: 12px; color: #ccc; margin-top: 6px; }
 
-/* Top Bar mờ kính */
+/* Top Bar */
 .top-bar {
     height: 28px;
     background: rgba(16, 16, 16, 0.75);
@@ -58,7 +53,7 @@ body {
 .top-bar .left { cursor: pointer; font-weight: 500;}
 .top-bar .right svg { cursor: pointer; margin-left: 12px; }
 
-/* FIX LỖI THANH DOCK: Đẩy tầng z-index lên cao nhất để mở khóa nút chuột */
+/* Ubuntu Dock */
 .side-dock {
     position: absolute;
     left: 8px;
@@ -73,7 +68,7 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 12px 0;
-    z-index: 999999 !important; /* Đảm bảo dock nằm trên cùng, không bị đè */
+    z-index: 999999 !important;
     border: 1px solid rgba(255,255,255,0.12);
     gap: 12px;
 }
@@ -88,40 +83,18 @@ body {
     cursor: pointer !important;
     background: rgba(255,255,255,0.06);
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: auto !important; /* Buộc trình duyệt cho phép click chuột */
+    pointer-events: auto !important;
 }
-.dock-item svg {
-    pointer-events: none; /* Tránh chuột click trúng ruột SVG làm lỗi hàm */
-}
-.dock-item:hover {
-    transform: scale(1.15);
-    background: #e95420 !important;
-    box-shadow: 0 5px 15px rgba(233, 84, 32, 0.4);
-}
-
-/* Tooltip */
-.dock-item .tooltip {
-    position: absolute;
-    left: 72px;
-    background: #111;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 11px;
-    color: #fff;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.15s;
-    white-space: nowrap;
-    border: 1px solid rgba(255,255,255,0.15);
-    pointer-events: none;
-}
+.dock-item svg { pointer-events: none; }
+.dock-item:hover { transform: scale(1.15); background: #e95420 !important; box-shadow: 0 5px 15px rgba(233, 84, 32, 0.4); }
+.dock-item .tooltip { position: absolute; left: 72px; background: #111; padding: 6px 12px; border-radius: 4px; font-size: 11px; color: #fff; visibility: hidden; opacity: 0; transition: opacity 0.15s; white-space: nowrap; border: 1px solid rgba(255,255,255,0.15); pointer-events: none; }
 .dock-item:hover .tooltip { visibility: visible; opacity: 1; }
 .settings-icon { margin-top: auto; }
 
-/* Không gian nền desktop hạ thấp tầng bảo đảm không che khuất dock */
+/* Desktop */
 .desktop { position: absolute; top: 28px; left: 76px; right: 0; bottom: 0; z-index: 50; }
 
-/* Cấu trúc thiết kế cửa sổ ứng dụng */
+/* Khung cửa sổ Gtk */
 .window {
     position: absolute;
     background: rgba(30, 30, 30, 0.88);
@@ -136,15 +109,8 @@ body {
     z-index: 100;
 }
 .window.hidden { display: none !important; }
-.window.maximized {
-    top: 28px !important;
-    left: 76px !important;
-    width: calc(100vw - 76px) !important;
-    height: calc(100vh - 28px) !important;
-    border-radius: 0;
-}
+.window.maximized { top: 28px !important; left: 76px !important; width: calc(100vw - 76px) !important; height: calc(100vh - 28px) !important; border-radius: 0; }
 
-/* Cấu trúc Header điều hướng cửa sổ */
 .window-header {
     height: 36px;
     background: #232323;
@@ -162,13 +128,18 @@ body {
 .window-title { color: #ddd; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; }
 .window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
-/* Terminal Layout */
-.terminal-body { background: #1C131A; padding: 15px; font-family: 'Courier New', monospace; overflow-y: auto; }
-.terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.5; font-family: 'Courier New', monospace; }
-.terminal-input-line { display: flex; align-items: center; font-size: 13px; color: #50fa7b; }
-.terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: 'Courier New', monospace; font-size: 13px; flex-grow: 1; }
+/* FIX LIỀN KHUNG TERMINAL NỘI BỘ (Ép Xterm gánh full diện tích) */
+.terminal-integrated-body {
+    background: #1C131A !important;
+    padding: 10px;
+    height: calc(100% - 36px);
+    width: 100%;
+}
+/* Làm mượt font chữ chữ hiển thị của xterm */
+.xterm .xterm-screen {
+    cursor: text;
+}
 
-/* About View */
 .about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 12px; background: #2A2A2A; }
 .ubuntu-btn { background: #E95420; border: none; color: white; padding: 8px 24px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
 .ubuntu-btn:hover { background: #c64113; }
