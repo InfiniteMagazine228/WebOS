@@ -1,4 +1,4 @@
-/* Giao diện chung & Hình nền Ubuntu */
+/* Khởi tạo chung hệ thống */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -15,7 +15,7 @@ body {
     overflow: hidden;
 }
 
-/* Top Bar mờ kính */
+/* Thanh Top Bar mờ kính */
 .top-bar {
     height: 28px;
     background: rgba(16, 16, 16, 0.65);
@@ -28,7 +28,7 @@ body {
     padding: 0 15px;
     font-size: 13px;
     font-weight: 500;
-    z-index: 9999;
+    z-index: 99999;
     position: relative;
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
@@ -49,7 +49,7 @@ body {
     flex-direction: column;
     align-items: center;
     padding-top: 12px;
-    z-index: 999;
+    z-index: 9999;
     border: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -68,9 +68,9 @@ body {
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
 }
 
-/* Fix lỗi hiển thị icon đầy đủ */
+/* Ép icon hiển thị chuẩn không bị mất hình */
 .dock-item i {
-    display: inline-block;
+    display: block !important;
 }
 
 .dock-item:hover {
@@ -78,7 +78,7 @@ body {
     background: rgba(233, 84, 32, 0.4);
 }
 
-/* Tooltip trên Dock */
+/* Tooltip phụ khi di chuột */
 .dock-item .tooltip {
     position: absolute;
     left: 68px;
@@ -98,10 +98,10 @@ body {
 /* Desktop */
 .desktop { position: absolute; top: 28px; left: 70px; right: 0; bottom: 0; }
 
-/* Cửa sổ ứng dụng */
+/* Định dạng cấu trúc Cửa sổ ứng dụng */
 .window {
     position: absolute;
-    background: rgba(35, 35, 35, 0.88);
+    background: rgba(35, 35, 35, 0.9);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-radius: 8px;
@@ -122,7 +122,7 @@ body {
 @keyframes zoomOut { to { transform: scale(0.88); opacity: 0; } }
 .hidden { display: none !important; }
 
-/* Tiêu đề thanh cửa sổ */
+/* Khung điều khiển Gtk Header */
 .window-header {
     height: 36px;
     background: #232323;
@@ -140,13 +140,13 @@ body {
 .window-title { color: #e6e6e6; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; }
 .window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
-/* CSS App 1: Terminal */
+/* CSS App Terminal */
 .terminal-body { background: #1C131A; padding: 12px; font-family: 'Courier New', monospace; overflow-y: auto;}
 .terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.4; }
 .terminal-input-line { display: flex; align-items: center; color: #dfdbd2; font-size: 13px;}
 .terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: monospace; font-size: 13px; flex-grow: 1; }
 
-/* CSS App 3: Files Manager */
+/* CSS Files Manager */
 .files-body { display: flex; padding: 0 !important; background: #2F2F2F; }
 .files-sidebar { width: 130px; background: #3A3A3A; padding-top: 15px; border-right: 1px solid #222; }
 .files-sidebar div { padding: 10px 15px; font-size: 13px; cursor: pointer; color: #ccc; }
@@ -159,18 +159,17 @@ body {
 .file-icon i.fa-file-alt { color: #9CA3AF; }
 .file-icon span { font-size: 12px; word-break: break-all; color: #e5e7eb; }
 
-/* CSS App 4: Music Player */
+/* CSS Music Player */
 .music-body { background: #1E1E1E; display: flex; align-items: center; padding: 20px; gap: 20px; }
-.music-body i.fa-music { font-size: 60px; color: #E95420; }
+.music-body i.fa-compact-disc { font-size: 60px; color: #E95420; }
 .music-info h4 { margin-bottom: 4px; color: #fff; font-size: 16px;}
 .music-info p { font-size: 12px; color: #aaa; margin-bottom: 15px;}
 .music-controls { display: flex; gap: 20px; font-size: 20px; cursor: pointer; }
 .music-controls i:hover { color: #E95420; }
-/* Animation đĩa nhạc quay đều */
 .disc-anime { animation: spin 4s linear infinite; animation-play-state: paused; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* CSS App 5: About Screen */
+/* CSS About */
 .about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 10px; background: #2A2A2A;}
 .about-body h3 { color: #E95420; font-size: 18px; margin-top: 5px;}
 .about-body p { font-size: 13px; color: #bbb; }
