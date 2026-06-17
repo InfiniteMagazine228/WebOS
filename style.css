@@ -1,4 +1,4 @@
-/* Tối ưu hóa giao diện và sửa lỗi click chuột trên Dock */
+/* Khởi tạo hệ thống cốt lõi */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -15,34 +15,34 @@ body {
     overflow: hidden;
 }
 
-/* Khung thông báo góc phải hệ thống */
+/* Khung thông báo hệ thống */
 .toast {
     position: fixed;
     top: 40px;
     right: 20px;
-    width: 280px;
-    background: rgba(30, 30, 30, 0.9);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 6px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    width: 290px;
+    background: rgba(25, 25, 25, 0.95);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
     color: white;
-    z-index: 999999;
+    z-index: 9999999;
     padding: 12px;
-    backdrop-filter: blur(10px);
-    transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+    backdrop-filter: blur(15px);
+    transition: all 0.2s ease-out;
 }
 .toast.hidden {
     opacity: 0;
     transform: translateY(-20px);
     pointer-events: none;
 }
-.toast-header { display: flex; align-items: center; font-weight: bold; font-size: 13px;}
-.toast-body { font-size: 12px; color: #ccc; margin-top: 5px; }
+.toast-header { display: flex; align-items: center; font-size: 13px;}
+.toast-body { font-size: 12px; color: #ccc; margin-top: 6px; line-height: 1.4; }
 
-/* Top Bar */
+/* Top Bar mờ kính */
 .top-bar {
     height: 28px;
-    background: rgba(16, 16, 16, 0.7);
+    background: rgba(16, 16, 16, 0.75);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     color: #dfdbd2;
@@ -51,30 +51,30 @@ body {
     align-items: center;
     padding: 0 15px;
     font-size: 13px;
-    z-index: 9999;
+    z-index: 99999;
     position: relative;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.top-bar .left { cursor: pointer; }
-.top-bar .right svg { cursor: pointer; }
+.top-bar .left { cursor: pointer; font-weight: 500;}
+.top-bar .right svg { cursor: pointer; margin-left: 12px; }
 
-/* FIXED LINUX DOCK - NẠP SẮC NÉT ICON SVG */
+/* FIX LỖI THANH DOCK: Đẩy tầng z-index lên cao nhất để mở khóa nút chuột */
 .side-dock {
     position: absolute;
     left: 8px;
     top: 36px;
     bottom: 8px;
-    width: 60px;
-    background: rgba(16, 16, 16, 0.55);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    width: 62px;
+    background: rgba(16, 16, 16, 0.55) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
     border-radius: 12px;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     align-items: center;
     padding: 12px 0;
-    z-index: 99999; /* Đẩy dock lên trên cùng không cho bất kỳ thuộc tính nào che khuất chuột */
-    border: 1px solid rgba(255,255,255,0.1);
+    z-index: 999999 !important; /* Đảm bảo dock nằm trên cùng, không bị đè */
+    border: 1px solid rgba(255,255,255,0.12);
     gap: 12px;
 }
 
@@ -88,29 +88,29 @@ body {
     cursor: pointer !important;
     background: rgba(255,255,255,0.06);
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: auto !important; /* Mở khóa phản hồi nút chuột chuột */
+    pointer-events: auto !important; /* Buộc trình duyệt cho phép click chuột */
 }
 .dock-item svg {
-    pointer-events: none;
+    pointer-events: none; /* Tránh chuột click trúng ruột SVG làm lỗi hàm */
 }
 .dock-item:hover {
     transform: scale(1.15);
     background: #e95420 !important;
-    box-shadow: 0 4px 12px rgba(233, 84, 32, 0.4);
+    box-shadow: 0 5px 15px rgba(233, 84, 32, 0.4);
 }
 
 /* Tooltip */
 .dock-item .tooltip {
     position: absolute;
-    left: 68px;
+    left: 72px;
     background: #111;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 4px;
     font-size: 11px;
     color: #fff;
     visibility: hidden;
     opacity: 0;
-    transition: 0.15s;
+    transition: opacity 0.15s;
     white-space: nowrap;
     border: 1px solid rgba(255,255,255,0.15);
     pointer-events: none;
@@ -118,22 +118,22 @@ body {
 .dock-item:hover .tooltip { visibility: visible; opacity: 1; }
 .settings-icon { margin-top: auto; }
 
-/* Desktop Workspace */
-.desktop { position: absolute; top: 28px; left: 76px; right: 0; bottom: 0; z-index: 1; }
+/* Không gian nền desktop hạ thấp tầng bảo đảm không che khuất dock */
+.desktop { position: absolute; top: 28px; left: 76px; right: 0; bottom: 0; z-index: 50; }
 
-/* Cấu trúc Cửa sổ Gnome */
+/* Cấu trúc thiết kế cửa sổ ứng dụng */
 .window {
     position: absolute;
-    background: rgba(30, 30, 30, 0.85);
+    background: rgba(30, 30, 30, 0.88);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.55);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    z-index: 10;
+    z-index: 100;
 }
 .window.hidden { display: none !important; }
 .window.maximized {
@@ -144,7 +144,7 @@ body {
     border-radius: 0;
 }
 
-/* Header */
+/* Cấu trúc Header điều hướng cửa sổ */
 .window-header {
     height: 36px;
     background: #232323;
@@ -162,13 +162,13 @@ body {
 .window-title { color: #ddd; font-size: 13px; font-weight: 500; text-align: center; flex-grow: 1; margin-right: 50px; }
 .window-body { flex-grow: 1; color: #fff; overflow: hidden; position: relative; }
 
-/* Terminal Style */
+/* Terminal Layout */
 .terminal-body { background: #1C131A; padding: 15px; font-family: 'Courier New', monospace; overflow-y: auto; }
 .terminal-text { margin-bottom: 6px; font-size: 13px; line-height: 1.5; font-family: 'Courier New', monospace; }
 .terminal-input-line { display: flex; align-items: center; font-size: 13px; color: #50fa7b; }
 .terminal-input-line input { background: transparent; border: none; outline: none; color: #fff; font-family: 'Courier New', monospace; font-size: 13px; flex-grow: 1; }
 
-/* About Panel */
+/* About View */
 .about-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; gap: 12px; background: #2A2A2A; }
 .ubuntu-btn { background: #E95420; border: none; color: white; padding: 8px 24px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
 .ubuntu-btn:hover { background: #c64113; }
