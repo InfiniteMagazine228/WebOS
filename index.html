@@ -3,52 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ubuntu Linux WebOS v6.0</title>
+    <title>Ubuntu Linux WebOS v5.0 - Ultimate Edition</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Nạp trực tiếp Font Awesome SVG Icons để không bao giờ lỗi hiển thị icon -->
-    <link rel="stylesheet" href="https://cloudflare.com" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
-    <!-- Hệ thống thông báo nổi (Notification Toast) -->
+    <!-- Pop-up thông báo hệ thống nổi (Notification) -->
     <div id="notification-toast" class="toast hidden">
         <div class="toast-header">
-            <i class="fas fa-info-circle"></i> <span id="toast-title">Hệ thống</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e95420" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span id="toast-title" style="margin-left:5px;">Hệ thống</span>
         </div>
         <div class="toast-body" id="toast-msg">Nội dung thông báo</div>
     </div>
 
-    <!-- Thanh trạng thái trên cùng -->
+    <!-- Thanh trạng thái trên cùng (Top Bar) -->
     <div class="top-bar">
-        <div class="left" onclick="showNotification('Ứng dụng', 'Phím tắt khả dụng: Win+X (Menu), Win+T (Terminal), Win+D (Ẩn hiện All)')">Activities</div>
+        <div class="left" onclick="showNotification('Phím tắt', 'Win+T: Terminal | Win+X: About | Win+D: Desktop')">Activities</div>
         <div class="center" id="live-clock">00:00:00</div>
         <div class="right">
-            <i class="fas fa-wifi"></i>
-            <i class="fas fa-volume-up"></i>
-            <i class="fas fa-battery-full"></i>
-            <i class="fas fa-power-off" onclick="showNotification('Hệ thống', 'Đang tắt nguồn máy chủ ảo...')"></i>
+            <!-- Icon SVG Pin & Mạng -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="margin-right:10px;"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="16" height="12" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="15"></line></svg>
         </div>
     </div>
 
     <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
     <div class="side-dock" id="main-dock">
-        <!-- Các app mặc định ban đầu -->
+        <!-- App Terminal mặc định ban đầu -->
         <div class="dock-item" id="dock-terminal" onclick="openWindow('terminal-window')">
-            <i class="fas fa-terminal"></i>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
             <span class="tooltip">Terminal (Win+T)</span>
         </div>
-        <div class="dock-item" id="dock-about" onclick="openWindow('about-window')">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">About System</span>
+        <!-- App Giới thiệu mặc định ban đầu -->
+        <div class="dock-item settings-icon" id="dock-about" onclick="openWindow('about-window')">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span class="tooltip">About OS (Win+X)</span>
         </div>
-        <!-- App mới được cài bằng lệnh sudo apt install sẽ tự sinh vào đây -->
     </div>
 
-    <!-- Khu vực Desktop chứa cửa sổ -->
+    <!-- Màn hình làm việc chính Desktop -->
     <div class="desktop" id="desktop-area">
 
-        <!-- CỬA SỔ 1: TERMINAL (Có tính năng cài đặt gói phần mềm apt) -->
-        <div id="terminal-window" class="window" style="width: 600px; height: 38px0px; top: 100px; left: 150px;">
+        <!-- CỬA SỔ TERMINAL -->
+        <div id="terminal-window" class="window" style="width: 580px; height: 360px; top: 80px; left: 120px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('terminal-window')"></span>
@@ -58,9 +56,10 @@
                 <div class="window-title">ubuntu@webos: ~</div>
             </div>
             <div class="window-body terminal-body" onclick="document.getElementById('terminal-input').focus()">
-                <p class="terminal-text">Welcome to Ubuntu Linux WebOS v4.0!</p>
-                <p class="terminal-text">Thử gõ lệnh: <span style="color: #f1fa8c;">sudo apt install firefox</span> hoặc <span style="color: #f1fa8c;">sudo apt install music</span></p>
-                <p class="terminal-text" style="color: #6272a4;">Gợi ý phần mềm: firefox, music, paint, doom</p>
+                <p class="terminal-text">Welcome to Ubuntu Linux WebOS v5.0!</p>
+                <p class="terminal-text">Gõ lệnh để thử nghiệm kho phần mềm APT:</p>
+                <p class="terminal-text">-> <span style="color: #f1fa8c;">sudo apt install firefox</span> (Mở trang JS.org)</p>
+                <p class="terminal-text">-> <span style="color: #f1fa8c;">sudo apt install doom</span> (Game DOOM giả lập)</p>
                 <div id="terminal-history"></div>
                 <div class="terminal-input-line">
                     <span>ubuntu@webos:~$ &nbsp;</span>
@@ -69,8 +68,8 @@
             </div>
         </div>
 
-        <!-- CỬA SỔ 2: ABOUT SYSTEM -->
-        <div id="about-window" class="window hidden" style="width: 420px; height: 280px; top: 120px; left: 200px;">
+        <!-- CỬA SỔ ABOUT SYSTEM -->
+        <div id="about-window" class="window hidden" style="width: 420px; height: 260px; top: 130px; left: 220px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots">
                     <span class="dot close" onclick="closeWindow('about-window')"></span>
@@ -80,46 +79,32 @@
                 <div class="window-title">About Ubuntu WebOS</div>
             </div>
             <div class="window-body about-body">
-                <img src="https://wikimedia.org" alt="Ubuntu Logo" width="60">
-                <h3>Ubuntu Linux WebOS v4.0</h3>
-                <p>Mô phỏng nhân hệ thống và cài đặt gói APT nâng cao.</p>
-                <p style="font-size: 11px; color: #888;">Nhấn phím <kbd>Win</kbd> + <kbd>X</kbd> để hiện danh sách ứng dụng.</p>
+                <img src="https://wikimedia.org" alt="Ubuntu Logo" width="55">
+                <h3>Ubuntu WebOS v5.0</h3>
+                <p>Mô phỏng GNOME Desktop và bộ nạp gói APT Package.</p>
                 <button class="ubuntu-btn" onclick="closeWindow('about-window')">Đóng</button>
             </div>
         </div>
 
-        <!-- KHO LƯU TRỮ CẤU TRÚC ỨNG DỤNG ĐỂ APT TỰ ĐỘNG ĐẺ CỬA SỔ KHI CÀI ĐẶT -->
-        <!-- App Firefox -->
-        <div id="firefox-window" class="window hidden DynamicApp" style="width: 750px; height: 480px;">
+        <!-- CẤU TRÚC ẨN CỦA DOCK KHI CÀI ĐẶT QUA LỆNH SUDO APT -->
+        <!-- Cửa sổ Firefox -->
+        <div id="firefox-window" class="window hidden" style="width: 750px; height: 480px; top: 60px; left: 160px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots"><span class="dot close" onclick="closeWindow('firefox-window')"></span><span class="dot minimize" onclick="closeWindow('firefox-window')"></span><span class="dot maximize" onclick="toggleMaximize('firefox-window')"></span></div>
                 <div class="window-title">Firefox Web Browser</div>
             </div>
-            <div class="window-body" style="padding:0;"><iframe src="https://js.org" style="width:100%; height:100%; border:none;"></iframe></div>
+            <div class="window-body" style="padding:0; background:#fff;"><iframe src="https://js.org" style="width:100%; height:100%; border:none;"></iframe></div>
         </div>
 
-        <!-- App Music -->
-        <div id="music-window" class="window hidden DynamicApp" style="width: 400px; height: 200px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots"><span class="dot close" onclick="closeWindow('music-window')"></span><span class="dot minimize" onclick="closeWindow('music-window')"></span><span class="dot maximize" onclick="toggleMaximize('music-window')"></span></div>
-                <div class="window-title">Music Player</div>
-            </div>
-            <div class="window-body music-body" style="padding:20px; display:flex; align-items:center; gap:20px; background:#222;">
-                <i class="fas fa-compact-disc fa-spin" style="font-size:50px; color:#e95420;"></i>
-                <div>
-                    <h4>Ubuntu Live Radio</h4>
-                    <audio src="https://soundhelix.com" controls style="margin-top:10px; width:220px;"></audio>
-                </div>
-            </div>
-        </div>
-
-        <!-- App Game Doom -->
-        <div id="doom-window" class="window hidden DynamicApp" style="width: 680px; height: 440px;">
+        <!-- Cửa sổ DOOM (Sử dụng link nạp tự do, loại bỏ dứt điểm lỗi Refused kết nối) -->
+        <div id="doom-window" class="window hidden" style="width: 680px; height: 450px; top: 70px; left: 190px;">
             <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
                 <div class="window-dots"><span class="dot close" onclick="closeWindow('doom-window')"></span><span class="dot minimize" onclick="closeWindow('doom-window')"></span><span class="dot maximize" onclick="toggleMaximize('doom-window')"></span></div>
-                <div class="window-title">DOOM Retro Classic (Shareware)</div>
+                <div class="window-title">DOOM Classic (Shareware v1.9)</div>
             </div>
-            <div class="window-body" style="padding:0;"><iframe src="https://dos.zone" style="width:100%; height:100%; border:none;" allowfullscreen></iframe></div>
+            <div class="window-body" style="padding:0; background:#000;">
+                <iframe src="https://js-dos.com" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" msallowfullscreen="true" style="width:100%; height:100%; border:none; display:block;"></iframe>
+            </div>
         </div>
 
     </div>
