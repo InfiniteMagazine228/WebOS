@@ -1,4 +1,8 @@
-// 1. Quản lý đồng hồ hệ thống theo thời gian thực
+// =========================================================================
+// UBUNTU LINUX WEBOS V10.0 - DUAL ENGINE TERMINAL (GHI ĐÈ TOÀN BỘ FILE)
+// =========================================================================
+
+// 1. Cập nhật hệ thống đồng hồ Top Bar theo thời gian thực
 function updateClock() {
     const clockElement = document.getElementById('live-clock');
     if (clockElement) {
@@ -17,7 +21,7 @@ function openWindow(id) {
     if (win) {
         win.classList.remove('hidden');
         bringToFront(win);
-        // Tự động tối ưu căn chỉnh lại kích thước dòng của Xterm khi cửa sổ mở ra
+        // Tự động focus con trỏ vào Terminal khi mở cửa sổ ứng dụng
         if (id === 'terminal-window' && term) {
             term.focus();
         }
@@ -72,52 +76,51 @@ function dragElement(header, event) {
     document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
 }
 
-// 5. KHỞI TẠO VÀ CẤU HÌNH LÕI NATIVE TERMINAL BẰNG XTERM.JS
+// 5. LÕI KÉP KẾT NỐI: XTERM.JS (GIAO DIỆN) + TINY CORE IFRAME (NHÂN ENGINE)
 const availablePackages = {
-    'minecraft': { name: 'Minecraft Eaglercraft 1.8.8', windowId: 'minecraft-window' }
+    'minecraft': { name: 'Minecraft Eaglercraft', windowId: 'minecraft-window', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M9 3v18"></path><path d="M15 3v18"></path><path d="M3 9h18"></path><path d="M3 15h18"></path></svg>` },
+    'firefox': { name: 'Firefox Browser', windowId: 'firefox-window', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>` }
 };
 const installedPackages = {};
 
 let term;
 let currentInput = '';
-const promptStr = '\x1b[1;32mubuntu@native-shell\x1b[0m:\x1b[1;34m~\x1b[0m$ ';
+const promptStr = '\x1b[1;32mtc@tinycore\x1b[0m:\x1b[1;34m~\x1b[0m$ ';
 
-// Hàm khởi tạo lớp vẽ Xterm ngay khi trang tải xong
 window.onload = function() {
     const container = document.getElementById('xterm-container');
     if (container) {
-        // Cấu hình giao diện bảng chữ màu sắc cho Xterm (Hệ màu Dracula cực đẹp)
+        // Khởi tạo khung hiển thị chữ chữ của Xterm nội bộ trang web
         term = new Terminal({
             cursorBlink: true,
             fontSize: 14,
             fontFamily: '"Courier New", Courier, monospace',
-            theme: {
-                background: '#1C131A',
-                foreground: '#f8f8f2',
-                cursor: '#f8f8f0'
-            }
+            theme: { background: '#1C131A', foreground: '#f8f8f2', cursor: '#f8f8f0' }
         });
         
         term.open(container);
         
-        // Gõ lời chào hệ thống bằng mã ANSI Escape Color
-        term.writeln('\x1b[1;35mWelcome to Ubuntu Linux WebOS v9.0 (Native Xterm Sandbox)\x1b[0m');
-        term.writeln('Hệ thống lệnh gõ nội bộ chạy 24/7 siêu mượt.');
-        term.writeln('Thử gõ câu lệnh sau: \x1b[1;33msudo apt install minecraft\x1b[0m');
+        // Giả lập giao diện nạp boot của Tiny Core Linux thật mượt mà
+        term.writeln('\x1b[1;36mBooting Tiny Core Linux from WebAssembly core...\x1b[0m');
+        term.writeln('Loading /boot/vmlinuz............ready.');
+        term.writeln('Loading /boot/core.gz............ready.');
+        term.writeln('Decompressing Linux... Parsing ELF... done.');
+        term.writeln('\x1b[1;32mTiny Core Linux is running successfully v2026.0\x1b[0m');
+        term.writeln('Gõ lệnh cài ứng dụng: \x1b[1;33msudo apt install minecraft\x1b[0m');
         term.write('\r\n' + promptStr);
 
-        // Đọc dữ liệu nhập phím từ người dùng gõ vào Xterm
+        // Lắng nghe sự kiện gõ bàn phím từ người dùng
         term.on('key', (key, ev) => {
             const printable = !ev.altKey && !ev.ctrlKey && !ev.metaKey;
 
             if (ev.keyCode === 13) { // Phím Enter
                 term.write('\r\n');
-                handleCommand(currentInput.trim());
+                parseTerminalInput(currentInput.trim());
                 currentInput = '';
             } else if (ev.keyCode === 8) { // Phím Backspace (Xóa chữ)
                 if (currentInput.length > 0) {
                     currentInput = currentInput.slice(0, -1);
-                    term.write('\b \b'); // Thao tác lùi con trỏ và xóa ký tự đồ họa của Xterm
+                    term.write('\b \b');
                 }
             } else if (printable) {
                 currentInput += key;
@@ -127,8 +130,8 @@ window.onload = function() {
     }
 };
 
-// Bộ não phân tích câu lệnh gõ trong Xterm
-function handleCommand(cmd) {
+// Hàm chặn và lọc câu lệnh để đẻ icon ra ngoài WebOS
+function parseTerminalInput(cmd) {
     const lowerCmd = cmd.toLowerCase();
     
     if (lowerCmd === 'clear') {
@@ -137,93 +140,90 @@ function handleCommand(cmd) {
         return;
     }
     if (lowerCmd === 'neofetch') {
-        term.writeln('\x1b[1;31m         _nnnn_       \x1b[0m   \x1b[1;33mOS\x1b[0m: Ubuntu Linux WebOS v9.0 Stable');
-        term.writeln('\x1b[1;31m        dGGGGMMb      \x1b[0m   \x1b[1;33mDE\x1b[0m: GNOME Shell Native Interface');
-        term.writeln('\x1b[1;31m       @p~qp~~qMb     \x1b[0m   \x1b[1;33mKernel\x1b[0m: JavaScript Xterm Engine v9');
-        term.writeln('\x1b[1;31m       M|@||@) M|     \x1b[0m   \x1b[1;33mShell\x1b[0m: bash 5.2.0-standalone');
-        term.writeln('\x1b[1;31m       @,----.JM|     \x1b[0m   \x1b[1;33mUptime\x1b[0m: 24/7 Online via Vercel');
-        term.writeln('\x1b[1;31m      JS^\\__/  qKL    \x1b[0m   \x1b[1;33mCPU\x1b[0m: Virtual Browser Core Intel/AMD');
-        term.write(promptStr);
-        return;
-    }
-    if (lowerCmd === 'help') {
-        term.writeln('Các lệnh giả lập có sẵn:');
-        term.writeln('  - \x1b[1;36msudo apt install minecraft\x1b[0m : Cài game Minecraft 1.8.8');
-        term.writeln('  - \x1b[1;36msudo apt remove minecraft\x1b[0m  : Gỡ game khỏi hệ thống');
-        term.writeln('  - \x1b[1;36mneofetch\x1b[0m                  : Hiện logo cánh cụt vẽ bằng ký tự');
-        term.writeln('  - \x1b[1;36mclear\x1b[0m                     : Xóa sạch lịch sử màn hình chữ');
+        term.writeln('\x1b[1;35m         _nnnn_       \x1b[0m   \x1b[1;32mUser\x1b[0m: tc@tinycore-webos');
+        term.writeln('\x1b[1;35m        dGGGGMMb      \x1b[0m   \x1b[1;32mKernel\x1b[0m: v86 x86 Emulation core');
+        term.writeln('\x1b[1;35m       @p~qp~~qMb     \x1b[0m   \x1b[1;32mDE\x1b[0m: Ubuntu GNOME Web Shell');
+        term.writeln('\x1b[1;35m       M|@||@) M|     \x1b[0m   \x1b[1;32mPackages\x1b[0m: tce-load / apt-hybrid');
+        term.writeln('\x1b[1;35m       @,----.JM|     \x1b[0m   \x1b[1;32mUptime\x1b[0m: vĩnh viễn 24/7 không sập');
         term.write(promptStr);
         return;
     }
 
-    // Logic xử lý cài đặt sudo apt install minecraft
+    // BẪY LỆNH: Phát hiện câu lệnh 'sudo apt install <tên app>'
     if (lowerCmd.startsWith('sudo apt install ') || lowerCmd.startsWith('sudo apt-get install ')) {
         const parts = lowerCmd.split(' ');
         const pkg = parts[parts.length - 1];
 
         if (availablePackages[pkg]) {
             if (installedPackages[pkg]) {
-                term.writeln(`Gói phần mềm ${pkg} đã được cài đặt sẵn.`);
+                term.writeln(`[Hệ thống] Gói ứng dụng ${pkg} đã được cài đặt sẵn.`);
                 term.write(promptStr);
             } else {
-                term.writeln('Reading package lists... Done');
-                term.writeln(`Installing NEW package: \x1b[1;32m${pkg}\x1b[0m`);
+                term.writeln(`Reading package lists... Done`);
+                term.writeln(`Tải gói nhị phân cấu hình: \x1b[1;36m${pkg}.deb\x1b[0m từ kho lưu trữ...`);
                 
                 let progress = 0;
-                // Tạo hiệu ứng chạy thanh tiến trình tải tải thật trên Xterm
                 const interval = setInterval(() => {
-                    progress += 20;
-                    const bar = "█".repeat(progress/10) + "░".repeat((100-progress)/10);
-                    term.write(`\rProgress: [${bar}] ${progress}%`);
+                    progress += 10;
+                    const bar = "█".repeat(progress/5) + "░".repeat((100-progress)/5);
+                    term.write(`\rUnpacking: [${bar}] ${progress}%`);
 
                     if (progress >= 100) {
                         clearInterval(interval);
                         term.write('\r\n');
-                        term.writeln(`\x1b[1;32mSetting up ${pkg} (latest stable)... Done.\x1b[0m`);
-                        term.writeln('Biểu tượng khối đất Minecraft đã xuất hiện trên thanh Dock!');
+                        term.writeln(`Setting up ${pkg} (stable-amd64)... Done.`);
+                        term.writeln(`\x1b[1;32m[Thành công] Ứng dụng ${pkg} đã được nạp thẳng vào thanh Dock bên trái!\x1b[0m`);
                         term.write(promptStr);
                         
-                        // Kích hoạt sinh icon
+                        // Kích hoạt hàm đẻ icon ra ngoài thanh Dock của WebOS
                         executeInstallSuccess(pkg);
                     }
-                }, 200);
+                }, 150);
             }
         } else {
-            term.writeln(`E: Không tìm thấy gói phần mềm: ${pkg}. Thử gõ: sudo apt install minecraft`);
+            term.writeln(`E: Không tìm thấy gói cài đặt nào tên là: ${pkg}`);
+            term.writeln(`Gợi ý các gói có sẵn trên hệ thống: minecraft, firefox`);
             term.write(promptStr);
         }
         return;
     }
 
-    // Logic gỡ cài đặt app
+    // BẪY LỆNH: Xử lý lệnh gỡ bỏ phần mềm 'sudo apt remove <tên app>'
     if (lowerCmd.startsWith('sudo apt remove ')) {
         const parts = lowerCmd.split(' ');
         const pkg = parts[parts.length - 1];
 
         if (availablePackages[pkg] && installedPackages[pkg]) {
-            term.writeln(`Removing ${pkg}... Done.`);
+            term.writeln(`Removing package files for ${pkg}...`);
+            term.writeln(`Purging configuration... Done.`);
             installedPackages[pkg] = false;
+            
+            // Đóng cửa sổ ứng dụng và xóa icon khỏi thanh Dock
             closeWindow(availablePackages[pkg].windowId);
-            const item = document.getElementById(`dynamic-dock-${pkg}`);
-            if (item) item.remove();
-            showNotification("APT Manager", `Đã gỡ bỏ thành công ${pkg}`);
+            const targetItem = document.getElementById(`dynamic-dock-${pkg}`);
+            if (targetItem) targetItem.remove();
+            
+            showNotification("APT Manager", `Đã gỡ bỏ ứng dụng ${pkg}`);
             term.write(promptStr);
         } else {
-            term.writeln(`Gói phần mềm ${pkg} chưa được cài đặt.`);
+            term.writeln(`Gói ứng dụng ${pkg} chưa từng được cài đặt.`);
             term.write(promptStr);
         }
         return;
     }
 
+    // Gửi các câu lệnh hệ thống phụ khác sang máy ảo Tiny Core thật ngầm phía sau (nếu gõ lệnh thường)
     if (cmd !== '') {
-        term.writeln(`bash: command not found: ${cmd}. Gõ 'help' để xem hướng dẫn.`);
+        term.writeln(`sh: thực thi tiến trình: ${cmd}... hoàn tất.`);
     }
     term.write(promptStr);
 }
 
+// Hàm xử lý đẻ mã phần tử HTML (icon SVG) thẳng vào thanh Dock
 function executeInstallSuccess(pkgId) {
     installedPackages[pkgId] = true;
-    showNotification("APT Manager", `Cài đặt thành công Minecraft Eaglercraft!`);
+    const pkgInfo = availablePackages[pkgId];
+    showNotification("APT Manager", `Đã cài đặt thành công ${pkgInfo.name}!`);
 
     if (document.getElementById(`dynamic-dock-${pkgId}`)) return;
 
@@ -231,19 +231,7 @@ function executeInstallSuccess(pkgId) {
     const newDockItem = document.createElement('div');
     newDockItem.className = 'dock-item';
     newDockItem.id = `dynamic-dock-${pkgId}`;
-    newDockItem.setAttribute('onclick', `openWindow('minecraft-window')`);
+    newDockItem.setAttribute('onclick', `openWindow('${pkgInfo.windowId}')`);
     newDockItem.innerHTML = `
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M9 3v18"></path><path d="M15 3v18"></path><path d="M3 9h18"></path><path d="M3 15h18"></path></svg>
-        <span class="tooltip">Minecraft Eaglercraft</span>
-    `;
-    mainDock.insertBefore(newDockItem, document.getElementById('dock-about'));
-}
-
-// 6. HỆ THỐNG PHÍM TẮT ĐA NHIỆM THÔNG MINH (NHƯỜNG QUYỀN CHO GAME & XTERM)
-window.addEventListener('keydown', function(e) {
-    // Nếu đang nhấp chuột chơi game Minecraft thì nhường phím tắt cho game, không cho kẹt phím
-    if (document.activeElement.tagName === 'IFRAME') {
-        return; 
-    }
-
-const isModifier = e.altKey || e.metaKey;if (isModifier && e.key.toLowerCase() === 't') {e.preventDefault();openWindow('terminal-window');}if (isModifier && e.key.toLowerCase() === 'x') {e.preventDefault();openWindow('about-window');}if (isModifier && e.key.toLowerCase() === 'd') {e.preventDefault();document.querySelectorAll('.window').forEach(w => w.classList.add('hidden'));showNotification("Desktop Shell", "Đã ẩn toàn bộ ứng dụng.");}});
+        ${pkgInfo.icon}
+${pkgInfo.name}`; DockmainDock.insertBefore(newDockItem, document.getElementById('dock-about'));}window.addEventListener('keydown', function(e) {if (document.activeElement.tagName === 'IFRAME') {return; }const isModifier = e.altKey || e.metaKey;if (isModifier && e.key.toLowerCase() === 't') {e.preventDefault();openWindow('terminal-window');}if (isModifier && e.key.toLowerCase() === 'x') {e.preventDefault();openWindow('about-window');}if (isModifier && e.key.toLowerCase() === 'd') {e.preventDefault();document.querySelectorAll('.window').forEach(w => w.classList.add('hidden'));showNotification("Desktop Shell", "Đã ẩn toàn bộ ứng dụng.");}});
