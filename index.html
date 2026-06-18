@@ -2,106 +2,131 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ubuntu Linux WebOS v10.0 - Fixed</title>
-    <!-- Nhúng CSS cốt lõi của WebOS -->
-    <link rel="stylesheet" href="style.css">
-    
+    <title>WebOS</title>
+    <style>
+        body { background-color: #1e1e1e; color: #00ff00; font-family: 'Courier New', Courier, monospace; padding: 10px; margin: 0; }
+        #output { white-space: pre-wrap; word-wrap: break-word; margin-bottom: 10px; }
+        #input-line { display: flex; }
+        #prompt { color: #87ff00; margin-right: 5px; }
+        #cmd { background: transparent; border: none; color: #ffffff; font-family: inherit; font-size: inherit; outline: none; flex: 1; }
+    </style>
+</head>
+<body>
 
-    <!-- Hệ thống thông báo nổi (Notification) -->
-    <div id="notification-toast" class="toast hidden">
-        <div class="toast-header">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e95420" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            <span id="toast-title" style="margin-left:6px; font-weight:bold;">Hệ thống</span>
-        </div>
-        <div class="toast-body" id="toast-msg">Nội dung thông báo</div>
-    </div>
+<div id="output">Chào mừng đến với Tinycore-Kernel Terminal! Gõ 'help' để xem danh sách lệnh.</div>
+<div id="input-line">
+    <span id="prompt">tc@tinycore-kernel:~$</span>
+    <input type="text" id="cmd" autofocus autocomplete="off">
+</div>
 
-    <!-- Thanh trạng thái trên cùng (Top Bar) -->
-    <div class="top-bar">
-        <div class="left" onclick="showNotification('Hệ thống', 'Phím tắt: Win+T (Terminal), Win+X (About), Win+D (Ẩn ứng dụng)')">Activities</div>
-        <div class="center" id="live-clock">00:00:00</div>
-        <div class="right">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="margin-right:12px;"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="16" height="12" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="15"></line></svg>
-        </div>
-    </div>
+<script>
+const cmdInput = document.getElementById('cmd');
+const output = document.getElementById('output');
 
-    <!-- Thanh ứng dụng bên trái (Ubuntu Dock) -->
-    <div class="side-dock" id="main-dock">
-        <div class="dock-item" id="dock-terminal" onclick="openWindow('terminal-window')">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-            <span class="tooltip">Terminal (Win+T)</span>
-        </div>
-        <div class="dock-item settings-icon" id="dock-about" onclick="openWindow('about-window')">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            <span class="tooltip">About System (Win+X)</span>
-        </div>
-    </div>
+// Danh sách các ứng dụng WebOS giả lập
+const webOSApps = {
+    'browser': 'Đang khởi động Trình duyệt Web...',
+    'settings': 'Đang mở Cài đặt hệ thống...',
+    'filemanager': 'Đang mở Trình quản lý tệp...',
+    'texteditor': 'Đang mở Trình chỉnh sửa văn bản...'
+};
 
-    <!-- Không gian màn hình Desktop chứa cửa sổ -->
-    <div class="desktop" id="desktop-area">
+function printText(text) {
+    output.innerText += "\n" + text;
+    window.scrollTo(0, document.body.scrollHeight);
+}
 
-        <!-- CỬA SỔ TERMINAL NATIVE XTERM (Đã sửa đổi id container nạp mượt mà) -->
-        <div id="terminal-window" class="window" style="width: 760px; height: 460px; top: 60px; left: 110px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots">
-                    <span class="dot close" onclick="closeWindow('terminal-window')"></span>
-                    <span class="dot minimize" onclick="closeWindow('terminal-window')"></span>
-                    <span class="dot maximize" onclick="toggleMaximize('terminal-window')"></span>
-                </div>
-                <div class="window-title">tc@tinycore-kernel: ~</div>
-            </div>
-            <!-- Khung div chuẩn để Xterm nạp đồ họa dòng lệnh vào lòng trang web -->
-            <div class="window-body terminal-integrated-body" id="xterm-container"></div>
-        </div>
+cmdInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        let input = cmdInput.value.trim();
+        cmdInput.value = '';
+        if (input === '') return;
 
-        <!-- CỬA SỔ ABOUT SYSTEM -->
-        <div id="about-window" class="window hidden" style="width: 420px; height: 260px; top: 120px; left: 200px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots">
-                    <span class="dot close" onclick="closeWindow('about-window')"></span>
-                    <span class="dot minimize" onclick="about-window")"></span>
-                    <span class="dot maximize" onclick="toggleMaximize('about-window')"></span>
-                </div>
-                <div class="window-title">About Ubuntu WebOS</div>
-            </div>
-            <div class="window-body about-body">
-                <img src="https://wikimedia.org" alt="Ubuntu Logo" width="55">
-                <h3>Ubuntu WebOS v10.0</h3>
-                <p>Hệ thống Terminal lõi kép, tự động bẫy câu lệnh gõ để nạp ứng dụng cục bộ.</p>
-                <button class="ubuntu-btn" onclick="closeWindow('about-window')">Đóng</button>
-            </div>
-        </div>
+        printText("tc@tinycore-kernel:~$ " + input);
+        handleCommand(input);
+    }
+});
 
-        <!-- CỬA SỔ FIREFOX BROWSER (Sẵn sàng kích hoạt bằng lệnh sudo apt install firefox) -->
-        <div id="firefox-window" class="window hidden" style="width: 760px; height: 500px; top: 50px; left: 150px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots"><span class="dot close" onclick="closeWindow('firefox-window')"></span><span class="dot minimize" onclick="closeWindow('firefox-window')"></span><span class="dot maximize" onclick="toggleMaximize('firefox-window')"></span></div>
-                <div class="window-title">Firefox Web Browser</div>
-            </div>
-            <div style="background: #38383D; padding: 6px 10px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #2B2A2F;">
-                <div style="color: #aaa; display: flex; gap: 12px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></div>
-                <div style="flex-grow: 1; background: #1C1B22; border-radius: 4px; padding: 4px 10px; color: #fff; font-size: 11px; display: flex; align-items: center; gap: 8px;">
-                    <input type="text" value="https://google.com" style="background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 11px;" readonly>
-                </div>
-            </div>
-            <div class="window-body" style="padding:0; background:#fff; height: calc(100% - 72px);"><iframe src="https://google.com/webhp?igu=1" style="width:100%; height:100%; border:none; background:#fff;"></iframe></div>
-        </div>
+function handleCommand(input) {
+    let args = input.split(' ');
+    let baseCmd = args[0];
 
-        <!-- CỬA SỔ MINECRAFT (Sẵn sàng kích hoạt bằng lệnh sudo apt install minecraft) -->
-        <div id="minecraft-window" class="window hidden" style="width: 820px; height: 540px; top: 60px; left: 180px;">
-            <div class="window-header" onmousedown="dragElement(this.parentElement, event)">
-                <div class="window-dots"><span class="dot close" onclick="closeWindow('minecraft-window')"></span><span class="dot minimize" onclick="closeWindow('minecraft-window')"></span><span class="dot maximize" onclick="toggleMaximize('minecraft-window')"></span></div>
-                <div class="window-title">Minecraft Java Edition v1.8.8 (Eaglercraft Cloud-WASM)</div>
-            </div>
-            <div class="window-body" style="padding:0; background:#000; height: calc(100% - 36px); width: 100%;">
-                <iframe src="https://eaglercraft.win" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" msallowfullscreen="true" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
-            </div>
-        </div>
+    // 1. Nhóm câu lệnh do bạn yêu cầu
+    if (input === 'sudo apt update') {
+        printText("Hit:1 http://ubuntu.com focal InRelease\nReading package lists... Done\nAll packages are up to date.");
+        return;
+    }
+    if (input === 'sudo apt install game') {
+        printText("Reading package lists...\nBuilding dependency tree...\nInstalling tetris-cli... Done!");
+        return;
+    }
+    if (input === 'sudo apt install minecraft' || input === 'sudo apt install eaglecraft') {
+        printText("Downloading Eaglecraft assets...\nSetting up Java Runtime...\nMinecraft (Eaglecraft) đã cài đặt thành công! Gõ 'run-eaglecraft' để chơi.");
+        return;
+    }
+    if (input === 'sudo apt install doom') {
+        printText("Downloading shareware DOOM WAD...\nCompiling chocolate-doom...\nDOOM đã cài đặt thành công! Gõ 'run-doom' để khởi động.");
+        return;
+    }
+    if (baseCmd === 'help') {
+        printText("--- DANH SÁCH LỆNH ---" +
+                  "\n• Nhóm cơ bản: help, neofetch, clear, date, whoami, uptime, echo, ping, history, uname, exit" +
+                  "\n• Cài đặt: sudo apt update, sudo apt install [game / minecraft / doom]" +
+                  "\n• Ứng dụng WebOS: open [browser / settings / filemanager / texteditor]");
+        return;
+    }
+    if (baseCmd === 'neofetch') {
+        printText("   /\\_/\\     tc@tinycore-kernel\n  ( o.o )    ------------------\n   > ^ <     OS: WebOS Simulator v1.0\n             Kernel: Tinycore-Kernel 2026\n             Uptime: 5 mins\n             Shell: bash custom\n             Resolution: 1024x768\n             CPU: Virtual Core i7\n             Memory: 2048MiB / 8192MiB");
+        return;
+    }
 
-    </div>
+    // 2. Nhóm 4 Ứng dụng WebOS (sử dụng lệnh: open [tên_app])
+    if (baseCmd === 'open') {
+        let appName = args[1];
+        if (webOSApps[appName]) {
+            printText(webOSApps[appName]);
+        } else {
+            printText("Không tìm thấy ứng dụng. Thử lại: open [browser, settings, filemanager, texteditor]");
+        }
+        return;
+    }
 
-    <script src="script.js"></script>
+    // 3. Thêm 10 câu lệnh hữu dụng bổ sung
+    switch(baseCmd) {
+        case 'clear':
+            output.innerText = 'Terminal đã được làm sạch.';
+            break;
+        case 'date':
+            printText(new Date().toString());
+            break;
+        case 'whoami':
+            printText("tc (Temporary Custom User)");
+            break;
+        case 'uptime':
+            printText("up 12 minutes, 1 user, load average: 0.00, 0.01, 0.05");
+            break;
+        case 'echo':
+            printText(args.slice(1).join(' '));
+            break;
+        case 'ping':
+            printText("PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=12.4 ms\n--- 8.8.8.8 ping statistics --- 1 packets transmitted, 1 received.");
+            break;
+        case 'history':
+            printText("1  help\n2  sudo apt update\n3  neofetch\n4  open browser");
+            break;
+        case 'uname':
+            printText("Linux tinycore-kernel 5.15.0-generic x86_64 GNU/Linux");
+            break;
+        case 'exit':
+            printText("Đang đóng phiên làm việc Terminal...");
+            break;
+        case 'run-doom':
+            printText("Đang khởi động DOOM... (Trò chơi đang chạy ngầm)");
+            break;
+        default:
+            printText(`bash: ${baseCmd}: command not found. Gõ 'help' để xem các lệnh có sẵn.`);
+    }
+}
+</script>
 </body>
 </html>
