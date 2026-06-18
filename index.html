@@ -11,8 +11,8 @@
         #desktop { width: 100%; height: calc(100% - 40px); background: linear-gradient(135deg, #4d1234 0%, #1e0b24 50%, #0f0714 100%); position: relative; }
         
         /* Biểu tượng trên Desktop */
-        .desktop-icon { position: absolute; top: 20px; left: 20px; width: 80px; text-align: center; color: white; cursor: pointer; text-shadow: 1px 1px 3px black; font-size: 12px; }
-        .desktop-icon img, .desktop-icon .icon-placeholder { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 8px; margin: 0 auto 5px auto; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.3); }
+        .desktop-icon { position: absolute; top: 20px; left: 20px; width: 80px; text-align: center; color: white; cursor: pointer; text-shadow: 1px 1px 3px black; font-size: 12px; user-select: none; }
+        .desktop-icon .icon-placeholder { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 8px; margin: 0 auto 5px auto; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.3); transition: background 0.2s; }
         .desktop-icon:hover .icon-placeholder { background: rgba(255,255,255,0.4); }
 
         /* Cửa sổ ứng dụng kiểu Windows/Linux Hybrid */
@@ -32,23 +32,23 @@
         .terminal-body { width: 100%; height: 100%; padding: 10px; color: #00ff00; font-family: 'Courier New', Courier, monospace; overflow-y: auto; font-size: 14px; background: #0c0c0c; }
         .terminal-output { white-space: pre-wrap; word-wrap: break-word; }
         .terminal-input-line { display: flex; align-items: center; margin-top: 5px; }
-        .terminal-prompt { color: #10b981; margin-right: 6px; font-weight: bold; }
+        .terminal-prompt { color: #10b981; margin-right: 6px; font-weight: bold; white-space: nowrap; }
         .terminal-cmd { background: transparent; border: none; color: #fff; font-family: inherit; font-size: inherit; outline: none; flex: 1; }
 
         /* Thanh Taskbar phía dưới cùng chuẩn Windows */
         #taskbar { width: 100%; height: 40px; background: #101010; border-top: 1px solid #252526; display: flex; align-items: center; padding: 0 10px; position: absolute; bottom: 0; z-index: 1000; }
-        #start-button { background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; font-size: 13px; cursor: pointer; margin-right: 10px; display: flex; align-items: center; gap: 5px; }
+        #start-button { background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; font-size: 13px; cursor: pointer; margin-right: 10px; display: flex; align-items: center; gap: 5px; user-select: none; }
         #start-button:hover { background: #3b82f6; }
         #taskbar-apps { display: flex; gap: 6px; flex: 1; overflow-x: auto; }
-        .taskbar-item { background: #262626; color: #e5e5e5; padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid #404040; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .taskbar-item { background: #262626; color: #e5e5e5; padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid #404040; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: none; }
         .taskbar-item:hover { background: #333333; }
-        #system-clock { color: #a3a3a3; font-size: 12px; padding: 0 10px; font-family: monospace; }
+        #system-clock { color: #a3a3a3; font-size: 12px; padding: 0 10px; font-family: monospace; user-select: none; }
     </style>
 </head>
 <body>
 
 <div id="desktop">
-    <!-- Icon mặc định trên màn hình -->
+    <!-- Click chuột vào icon này để gọi hàm openWindow -->
     <div class="desktop-icon" onclick="openWindow('terminal')">
         <div class="icon-placeholder">🐚</div>
         Terminal
@@ -57,16 +57,15 @@
 
 <!-- Thanh tác vụ Taskbar -->
 <div id="taskbar">
-    <button id="start-button">📁 Applications</button>
+    <button id="start-button" onclick="openWindow('terminal')">📁 Applications</button>
     <div id="taskbar-apps"></div>
     <div id="system-clock">00:00:00</div>
 </div>
 
 <script>
-// Quản lý các cửa sổ đang hoạt động
 let windowCounter = 0;
 
-// Cập nhật đồng hồ hệ thống giống Windows
+// Cập nhật đồng hồ hệ thống góc phải Taskbar
 function updateClock() {
     const now = new Date();
     document.getElementById('system-clock').innerText = now.toTimeString().split(' ')[0];
@@ -74,21 +73,22 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Tạo và mở cửa sổ ứng dụng mới linh hoạt
+// Hàm khởi tạo và dựng cấu trúc cửa sổ ứng dụng Iframe / Terminal
 function openWindow(type, customTitle = "") {
     windowCounter++;
     const desktop = document.getElementById('desktop');
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `win-${windowCounter}`;
-    // Đặt vị trí ngẫu nhiên một chút để không đè khít lên nhau
-    win.style.top = `${60 + (windowCounter % 5) * 30}px`;
-    win.style.left = `${100 + (windowCounter % 5) * 40}px`;
+    
+    // Tạo vị trí so le nhẹ để không đè khít lên cửa sổ cũ
+    win.style.top = `${60 + (windowCounter % 5) * 25}px`;
+    win.style.left = `${100 + (windowCounter % 5) * 35}px`;
 
     let title = customTitle || type.toUpperCase();
     let bodyContent = "";
 
-    // Cấu hình mã nhúng iframe hoặc mã HTML cho từng loại app khác nhau
+    // Định nghĩa ruột ứng dụng (Iframe thực hoặc Giao diện)
     if (type === 'terminal') {
         title = "tc@tinycore-kernel: ~";
         bodyContent = `
@@ -106,17 +106,15 @@ function openWindow(type, customTitle = "") {
     } 
     else if (type === 'minecraft' || type === 'eaglecraft') {
         title = "Minecraft Eaglecraft Edition";
-        // Nhúng một bản sao Eaglecraft mã nguồn mở hoạt động ổn định trên nền Web
         bodyContent = `<iframe class="win-iframe" src="https://vse.gq"></iframe>`;
     } 
     else if (type === 'doom') {
         title = "Classic Linux DOOM";
-        // Nhúng phiên bản giả lập DOSBox Web chạy trực tiếp DOOM 1
         bodyContent = `<iframe class="win-iframe" src="https://dos.zone"></iframe>`;
     } 
     else if (type === 'filemanager') {
         title = "Trình quản lý tệp tin (Nautilus Lite)";
-        bodyContent = `<iframe class="win-iframe" src="https://cloudcmd.io"></iframe>`; // Giao diện quản lý file web trực quan
+        bodyContent = `<iframe class="win-iframe" src="https://cloudcmd.io"></iframe>`;
     } 
     else if (type === 'texteditor') {
         title = "Gedit Text Editor";
@@ -136,7 +134,14 @@ function openWindow(type, customTitle = "") {
     `;
 
     desktop.appendChild(win);
-    addInputFieldFocus(win.id);
+    
+    // Kích hoạt tính năng kéo thả cho cửa sổ mới tạo
+    dragElement(win);
+    
+    // Tự động focus vào ô nhập lệnh nếu là cửa sổ Terminal
+    const input = document.getElementById(`term-cmd-${windowCounter}`);
+    if (input) input.focus();
+
     addToTaskbar(win.id, title);
 }
 
@@ -155,8 +160,6 @@ function maximizeWin(id) {
     if (win.style.width === '100%') {
         win.style.width = '700px';
         win.style.height = '450px';
-        win.style.top = '100px';
-        win.style.left = '100px';
     } else {
         win.style.width = '100%';
         win.style.height = '100%';
@@ -175,28 +178,7 @@ function addToTaskbar(id, title) {
     taskbarApps.appendChild(taskItem);
 }
 
-function addInputFieldFocus(id) {
-    const input = document.querySelector(`#${id} .terminal-cmd`);
-    if (input) input.focus();
-}
-
-// Xử lý logic thông dịch dòng lệnh Linux bên trong Terminal
-function handleTerminalKey(event, winIndex) {
-    if (event.key === 'Enter') {
-        const cmdInput = document.getElementById(`term-cmd-${winIndex}`);
-        const output = document.getElementById(`term-out-${winIndex}`);
-        let input = cmdInput.value.trim();
-        cmdInput.value = '';
-
-        if (input === '') return;
-
-        output.innerText += `\ntc@tinycore-kernel:~$ ${input}`;
-        
-        let args = input.split(' ');
-        let baseCmd = args;
-
-        // Tập hợp xử lý các câu lệnh
-// Xử lý logic thông dịch dòng lệnh Linux bên trong Terminal
+// Bộ thông dịch lệnh Terminal
 function handleTerminalKey(event, winIndex) {
     if (event.key === 'Enter') {
         const cmdInput = document.getElementById(`term-cmd-${winIndex}`);
@@ -210,49 +192,37 @@ function handleTerminalKey(event, winIndex) {
         
         let args = input.split(' ');
         let baseCmd = args[0];
+        let targetApp = args[1];
 
-        // Tập hợp xử lý các câu lệnh
         if (input === 'help') {
-            output.innerText += "\n--- CÁC CÂU LỆNH HỆ THỐNG ---\n• Trợ giúp: help, neofetch, clear, date, whoami, uptime\n• Cài đặt (giả lập): sudo apt update, sudo apt install [game / minecraft / doom]\n• Điều khiển đồ họa: open [browser / settings / filemanager / texteditor / minecraft / doom]";
-        } 
-        else if (input === 'neofetch') {
-            output.innerText += "\n   /\\_/\\     tc@linwin-node\n  ( o.o )    --------------\n   > ^ <     OS: LinWin OS Core v2.0\n             Kernel: Linux 6.2.0-custom-hybrid\n             Shell: bash v5.1\n             DE: Windows Taskbar Layout\n             WM: Custom OpenBox-JS\n             CPU: Virtual x86 Processor (8 Cores)\n             Memory: 4096MB / 16384MB";
-        } 
-        else if (input === 'clear') {
+        if (input === 'help') {
+            output.innerText += "\n--- CÁC CÂU LỆNH HỆ THỐNG ---\n• Trợ giúp: help, neofetch, clear, date, whoami, uptime\n• Cài đặt (giả lập): sudo apt update, sudo apt install [game / minecraft / doom]\n• Điều khiển đồ họa: open [browser / filemanager / texteditor / minecraft / doom]";
+        } else if (input === 'neofetch') {
+            output.innerText += "\n   /\\_/\\     tc@linwin-node\n  ( o.o )    --------------\n   > ^ <     OS: LinWin OS Core v2.0\n             Kernel: Linux 6.2.0-custom-hybrid\n             Shell: bash v5.1\n             DE: Windows Taskbar Layout\n             CPU: Virtual x86 Processor (8 Cores)\n             Memory: 4096MB / 16384MB";
+        } else if (input === 'clear') {
             output.innerText = 'Màn hình Terminal đã được xóa.';
-        } 
-        else if (input === 'date') {
+        } else if (input === 'date') {
             output.innerText += `\n${new Date().toString()}`;
-        } 
-        else if (input === 'whoami') {
+        } else if (input === 'whoami') {
             output.innerText += "\ntc";
-        } 
-        else if (input === 'uptime') {
-            output.innerText += "\nup 45 minutes, 1 active session, load average: 0.12, 0.08, 0.02";
-        } 
-        else if (input === 'sudo apt update') {
+        } else if (input === 'uptime') {
+            output.innerText += "\nup 45 minutes, 1 active session, load average: 0.12";
+        } else if (input === 'sudo apt update') {
             output.innerText += "\nGet:1 http://linwin.org InRelease [15.4 kB]\nReading package lists... Done.\nAll extensions and applications are ready to launch.";
-        } 
-        else if (input === 'sudo apt install game' || input === 'sudo apt install tetris') {
+        } else if (input === 'sudo apt install game' || input === 'sudo apt install tetris') {
             output.innerText += "\nDownloading assets...\nUnpacking package tree...\nCài đặt hoàn tất! Gõ 'open texteditor' để giải trí viết lách hoặc dùng 'open browser'.";
-        } 
-        else if (input === 'sudo apt install minecraft' || input === 'sudo apt install eaglecraft') {
-            output.innerText += "\nFetching Eaglecraft client source from network...\nSetting up local node modules...\nCài đặt Minecraft thành công! Gõ lệnh 'open minecraft' để bắt đầu chơi.";
-        } 
-        else if (input === 'sudo apt install doom') {
-            output.innerText += "\nLoading DOOM Shareware contents...\nCompiling web-wasm binaries...\nCài đặt DOOM thành công! Gõ 'open doom' để chiến đấu.";
-        } 
-        // Lệnh OPEN tích hợp mở trực tiếp cửa sổ iframe lên Desktop
-        else if (baseCmd === 'open') {
-            let targetApp = args[1];
-            if (['browser', 'settings', 'filemanager', 'texteditor', 'minecraft', 'doom'].includes(targetApp)) {
+        } else if (input === 'sudo apt install minecraft' || input === 'sudo apt install eaglecraft') {
+            output.innerText += "\nFetching Eaglecraft client source from network...\nCài đặt Minecraft thành công! Gõ lệnh 'open minecraft' để bắt đầu chơi.";
+        } else if (input === 'sudo apt install doom') {
+            output.innerText += "\nLoading DOOM Shareware contents...\nCài đặt DOOM thành công! Gõ 'open doom' để chiến đấu.";
+        } else if (baseCmd === 'open') {
+            if (['browser', 'filemanager', 'texteditor', 'minecraft', 'doom'].includes(targetApp)) {
                 output.innerText += `\nĐang mở ứng dụng đồ họa: ${targetApp}...`;
                 openWindow(targetApp);
             } else {
-                output.innerText += `\nKhông tìm thấy ứng dụng đồ họa có tên '${targetApp}'. Thử: open [browser, minecraft, doom, filemanager, texteditor]`;
+                output.innerText += `\nKhông tìm thấy ứng dụng đồ họa có tên '${targetApp || ''}'. Thử: open [browser, minecraft, doom, filemanager, texteditor]`;
             }
-        } 
-        else {
+        } else {
             output.innerText += `\nbash: ${baseCmd}: command not found. Nhập 'help' để xem danh sách.`;
         }
 
@@ -270,22 +240,17 @@ function dragElement(elmnt) {
     const header = elmnt.querySelector('.window-header');
     if (header) {
         header.onmousedown = dragMouseDown;
-    } else {
-        elmnt.onmousedown = dragMouseDown;
     }
 
     function dragMouseDown(e) {
         e = e || window.event;
-        // Loại trừ không cho kéo khi bấm nhầm vào các nút thu phóng
-        if(e.target.closest('.window-controls')) return;
-        
+        if (e.target.closest('.window-controls')) return;
         e.preventDefault();
         pos3 = e.clientX;
         pos4 = e.clientY;
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
         
-        // Đưa cửa sổ đang kéo lên trên cùng bằng z-index
         document.querySelectorAll('.window').forEach(w => w.style.zIndex = 10);
         elmnt.style.zIndex = 100;
     }
@@ -307,9 +272,9 @@ function dragElement(elmnt) {
     }
 }
 
-// Tự động mở một cửa sổ Terminal ngay khi vừa tải hệ điều hành
+// Tự động bung cửa sổ Terminal ngay khi tải xong trang
 window.onload = () => {
-    if (typeof openWindow === "function") {
+    if (typeof openWindow === 'function') {
         openWindow('terminal');
     }
 };
