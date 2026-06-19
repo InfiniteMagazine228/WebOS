@@ -2,10 +2,10 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Linux Pure Terminal</title>
+    <title>Linux Pure Terminal - DEB Package Manager</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0c0c0c; color: #00ff00; font-family: 'Courier New', Courier, monospace; overflow: hidden; }
-        #terminal { width: 100%; height: 100%; padding: 15px; display: flex; flex-direction: column; box-sizing: border-box; }
+        #terminal { width: 100%; height: 100%; padding: 15px; display: flex; flex-direction: column; box-sizing: border-box; position: relative; }
         #output { white-space: pre-wrap; word-wrap: break-word; flex: 1; overflow-y: auto; margin-bottom: 10px; }
         #input-line { display: flex; align-items: center; }
         #prompt { color: #10b981; font-weight: bold; margin-right: 8px; white-space: nowrap; }
@@ -16,11 +16,41 @@
         .app-header { background: #1e1e1e; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; color: #d4d4d4; font-size: 13px; }
         .close-btn { background: #ff5f56; border: none; color: white; border-radius: 50%; width: 16px; height: 16px; cursor: pointer; font-size: 10px; line-height: 16px; text-align: center; }
         .app-iframe { flex: 1; border: none; background: white; }
+
+        /* Bảng điều khiển nạp/tải tệp .deb ở góc phải màn hình */
+        #deb-control-panel { position: absolute; top: 15px; right: 15px; background: rgba(30, 30, 30, 0.85); border: 1px solid #444; padding: 10px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-family: sans-serif; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .panel-title { color: #aaa; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; text-align: center; }
+        .deb-btn { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; transition: background 0.2s; text-align: center; }
+        .deb-btn:hover { background: #3b82f6; }
+        .deb-btn.download { background: #059669; }
+        .deb-btn.download:hover { background: #10b981; }
+        #file-input { display: none; }
+        .deb-select { background: #111; color: #00ff00; border: 1px solid #444; font-family: monospace; font-size: 12px; padding: 4px; border-radius: 4px; outline: none; }
     </style>
 </head>
 <body>
 
 <div id="terminal">
+    <!-- Bảng điều khiển Quản lý tệp DEB -->
+    <div id="deb-control-panel">
+        <div class="panel-title">Hộp tiện ích .DEB</div>
+        
+        <!-- Chọn gói có sẵn để tải về máy thật -->
+        <select id="package-selector" class="deb-select">
+            <option value="minecraft">minecraft.deb</option>
+            <option value="doom">doom.deb</option>
+            <option value="browser">browser.deb</option>
+            <option value="filemanager">filemanager.deb</option>
+            <option value="texteditor">texteditor.deb</option>
+            <option value="game">game.deb</option>
+        </select>
+        <button class="deb-btn download" onclick="downloadDebFile()">💾 Tải gói .deb về máy</button>
+        
+        <!-- Nút bấm để chọn tệp .deb từ máy thật nạp vào Terminal -->
+        <button class="deb-btn" onclick="document.getElementById('file-input').click()">📂 Nạp tệp .deb vào máy</button>
+        <input type="file" id="file-input" accept=".deb" onchange="uploadDebFile(event)">
+    </div>
+
     <div id="output">Chào mừng đến với Tinycore-Kernel Terminal! Gõ 'help' để xem danh sách lệnh Linux.</div>
     
     <div id="app-container"></div>
@@ -36,7 +66,7 @@ const cmdInput = document.getElementById('cmd');
 const output = document.getElementById('output');
 const appContainer = document.getElementById('app-container');
 
-// Danh sách trạng thái cài đặt phần mềm (Mặc định là false - chưa cài)
+// Danh sách trạng thái cài đặt phần mềm
 let installedApps = {
     'game': false, 'tetris': false,
     'minecraft': false, 'eaglecraft': false,
@@ -61,6 +91,69 @@ function printText(text) {
     output.scrollTop = output.scrollHeight;
 }
 
+// 💾 HÀM 1: Xuất xuất dữ liệu cấu hình thành file .deb tải xuống máy thật
+function downloadDebFile() {
+    const selectedPkg = document.getElementById('package-selector').value;
+    const debContent = JSON.stringify({
+        packageName: selectedPkg,
+        sourceUrl: appSources[selectedPkg],
+        architecture: "amd64",
+        description: `Gói cài đặt giả lập cho ${selectedPkg} trên LinWinOS.`
+    }, null, 2);
+
+    const blob = new Blob([debContent], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${selectedPkg}.deb`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    printText(`[Hệ thống] Đã xuất và tải xuống tệp tin: ${selectedPkg}.deb thành công.`);
+}
+
+// 📂 HÀM 2: Đọc tệp .deb tải lên từ máy thật và tự động kích hoạt cài đặt
+function uploadDebFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Kiểm tra đuôi tệp
+    if (!file.name.endsWith('.deb')) {
+        printText("E: Định dạng tệp không hợp lệ. Hệ thống chỉ chấp nhận tệp có đuôi mở rộng .deb");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            // Đọc cấu trúc tệp dữ liệu gói
+            const pkgData = JSON.parse(e.target.result);
+            const debName = pkgData.packageName;
+
+            if (debName in installedApps) {
+                printText(`\ntc@tinycore-kernel:~$ sudo dpkg -i ${file.name}`);
+                printText(`Selecting previously unselected package ${debName}.`);
+                printText(`Preparing to unpack ${file.name} ...`);
+                printText(`Unpacking ${debName} ...`);
+                printText(`Setting up ${debName} ...`);
+                printText(`[Hệ thống] Cài đặt thành công ứng dụng gói ngoại vi [${debName}] từ tệp tin bên ngoài! Gõ 'run ${debName}' để kích hoạt.`);
+                
+                installedApps[debName] = true; // Kích hoạt quyền chạy ứng dụng
+            } else {
+                printText(`\nE: Gói phần mềm '${debName}' bên trong tệp tin không tương thích với nhân hạt Core hiện tại.`);
+            }
+        } catch (err) {
+            // Trường hợp file .deb rỗng hoặc tự tạo không đúng cấu trúc JSON hệ thống
+            printText(`\ntc@tinycore-kernel:~$ sudo dpkg -i ${file.name}`);
+            printText("E: Tệp tin .deb bị hỏng hoặc lỗi cấu trúc dữ liệu nhị phân bên trong.");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input để có thể nạp lại file cũ nếu cần
+}
+
 cmdInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         let input = cmdInput.value.trim();
@@ -76,7 +169,6 @@ function handleCommand(input) {
     let args = input.split(' ');
     let baseCmd = args[0]; 
 
-    // 1. NHÓM LỆNH HỆ THỐNG
     if (input === 'help') {
         printText("--- CÁC CÂU LỆNH HỆ THỐNG ---" +
                   "\n• Hệ thống: help, neofetch, clear, date, whoami, uptime" +
@@ -93,22 +185,12 @@ function handleCommand(input) {
         output.innerText = 'Màn hình Terminal đã được làm sạch.';
         return;
     }
-    if (input === 'date') {
-        printText(new Date().toString());
-        return;
-    }
-    if (input === 'whoami') {
-        printText("tc");
-        return;
-    }
-    if (input === 'uptime') {
-        printText("up 1 hour, 1 active user, load average: 0.05");
-        return;
-    }
+    if (input === 'date') { printText(new Date().toString()); return; }
+    if (input === 'whoami') { printText("tc"); return; }
+    if (input === 'uptime') { printText("up 1 hour, 1 active user, load average: 0.05"); return; }
 
-    // 2. XỬ LÝ LỆNH SUDO APT UPDATE VÀ INSTALL
     if (input === 'sudo apt update') {
-        printText("Get:1 http://tinycore.org stable InRelease [12.4 kB]\nGet:2 http://tinycore.org stable/main amd64 Packages [150 kB]\nFetched 162.4 kB in 1s (162 kB/s)\nReading package lists... Done.\nAll package definitions are up to date.");
+        printText("Get:1 http://tinycore.org stable InRelease [12.4 kB]\nReading package lists... Done.\nAll package definitions are up to date.");
         return;
     }
 
@@ -120,56 +202,4 @@ function handleCommand(input) {
         }
 
         if (debName in installedApps) {
-            printText(`Reading package lists... Done\nBuilding dependency tree... Done\nDownloading ${debName}...\nUnpacking ${debName}...\nSetting up ${debName}...\nCài đặt thành công! Gõ 'run ${debName}' để mở.`);
-            installedApps[debName] = true; 
-        } else {
-            printText(`E: Unable to locate package ${debName}. Nhập 'help' để xem các gói có sẵn.`);
-        }
-        return;
-    }
-
-    // 3. LỆNH RUN KHỞI CHẠY ỨNG DỤNG
-    if (baseCmd === 'run') {
-        let debName = args[1];
-        if (!debName) {
-            printText("Lỗi: Hãy dùng cú pháp: run [tên_gói]");
-            return;
-        }
-
-        if (installedApps[debName] === true) {
-            printText(`Đang mở ứng dụng đồ họa: ${debName}...`);
-            appContainer.innerHTML = ''; 
-
-            const appWin = document.createElement('div');
-            appWin.className = 'app-window';
-            appWin.id = 'active-app';
-            appWin.innerHTML = `
-                <div class="app-header">
-                    <span>📦 Application Core: ${debName.toUpperCase()}</span>
-                    <button class="close-btn" onclick="closeActiveApp()">X</button>
-                </div>
-                <iframe class="app-iframe" src="${appSources[debName]}"></iframe>
-            `;
-            appContainer.appendChild(appWin);
-        } else if (debName in installedApps) {
-            printText(`bash: run: Lệnh bị từ chối. Bạn chưa cài đặt gói này. Hãy gõ 'sudo apt install ${debName}' trước.`);
-        } else {
-            printText(`bash: run: Không tìm thấy phần mềm nào có tên '${debName}'.`);
-        }
-        return;
-    }
-
-    printText(`bash: ${baseCmd}: command not found. Gõ 'help' để hỗ trợ.`);
-}
-
-function closeActiveApp() {
-    const activeApp = document.getElementById('active-app');
-    if (activeApp) {
-        activeApp.remove();
-        printText("Đã đóng ứng dụng. Hệ thống sẵn sàng nhận lệnh mới.");
-        cmdInput.focus();
-    }
-}
-</script>
-</body>
-</html>
+printText(Reading package lists... Done\nDownloading ${debName}...\nSetting up ${debName}...\nCài đặt thành công! Gõ 'run ${debName}' để mở.);installedApps[debName] = true;} else {printText(E: Unable to locate package ${debName}. Nhập 'help' để xem các gói có sẵn.);}return;}if (baseCmd === 'run') {let debName = args[1];if (!debName) {printText("Lỗi: Hãy dùng cú pháp: run [tên_gói]");return;}if (installedApps[debName] === true) {printText(Đang mở ứng dụng đồ họa: ${debName}...);appContainer.innerHTML = '';const appWin = document.createElement('div');appWin.className = 'app-window';appWin.id = 'active-app';appWin.innerHTML = <div class="app-header"> <span>📦 Application Core: ${debName.toUpperCase()}</span> <button class="close-btn" onclick="closeActiveApp()">X</button> </div> <iframe class="app-iframe" src="${appSources[debName]}"></iframe>;appContainer.appendChild(appWin);} else if (debName in installedApps) {printText(bash: run: Lệnh bị từ chối. Bạn chưa cài đặt gói này. Hãy gõ 'sudo apt install ${debName}' hoặc nạp file .deb vào.);} else {printText(bash: run: Không tìm thấy phần mềm nào có tên '${debName}'.);}return;}printText(bash: ${baseCmd}: command not found. Gõ 'help' để hỗ trợ.);}function closeActiveApp() {const activeApp = document.getElementById('active-app');if (activeApp) {activeApp.remove();printText("Đã đóng ứng dụng. Hệ thống sẵn sàng nhận lệnh mới.");cmdInput.focus();}}
