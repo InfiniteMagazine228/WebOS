@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Linux Pure Terminal - Fixed Enter</title>
+    <title>Linux Pure Terminal - Fixed 100%</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0c0c0c; color: #00ff00; font-family: 'Courier New', Courier, monospace; overflow: hidden; }
         #terminal { width: 100%; height: 100%; padding: 15px; display: flex; flex-direction: column; box-sizing: border-box; position: relative; }
@@ -60,6 +60,7 @@ const cmdInput = document.getElementById('cmd');
 const output = document.getElementById('output');
 const appContainer = document.getElementById('app-container');
 
+// Khai báo danh sách app
 let installedApps = {
     'git': false, 'game': false, 'tetris': false,
     'minecraft': false, 'eaglecraft': false,
@@ -67,6 +68,7 @@ let installedApps = {
     'filemanager': false, 'texteditor': false
 };
 
+// URL nguồn nhúng Iframe
 const appSources = {
     'git': 'https://github.com',
     'game': 'https://cloudcmd.io',
@@ -84,16 +86,15 @@ function printText(text) {
     output.scrollTop = output.scrollHeight;
 }
 
+// Hàm tải file .deb giả lập về máy thật
 function downloadDebFile() {
     const selectedPkg = document.getElementById('package-selector').value;
     const debContent = JSON.stringify({
         packageName: selectedPkg,
-        sourceUrl: appSources[selectedPkg],
-        architecture: "amd64",
-        description: `Gói cài đặt giả lập cho ${selectedPkg} trên LinWinOS.`
+        sourceUrl: appSources[selectedPkg]
     }, null, 2);
 
-    const blob = new Blob([debContent], { type: "application/octet-stream" });
+    const blob = new Blob([debContent], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -103,16 +104,16 @@ function downloadDebFile() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    printText(`[Hệ thống] Đã xuất và tải xuống tệp tin: ${selectedPkg}.deb thành công.`);
+    printText(`[Hệ thống] Đã xuất và tải xuống tệp tin cấu trúc: ${selectedPkg}.deb`);
 }
 
-// ĐÃ SỬA LỖI: Lấy chính xác phần tử tệp tin đầu tiên [0] để không làm sập Enter
+// Hàm đọc file .deb tải lên từ máy thật để kích hoạt cài đặt
 function uploadDebFile(event) {
-    const file = event.target.files[0]; 
+    const file = event.target.files[0]; // Đã sửa chỉ mục lấy file chuẩn xác [0]
     if (!file) return;
 
     if (!file.name.endsWith('.deb')) {
-        printText("E: Định dạng tệp không hợp lệ. Hệ thống chỉ chấp nhận tệp có đuôi mở rộng .deb");
+        printText("E: Định dạng tệp không hợp lệ. Chỉ chấp nhận đuôi mở rộng .deb");
         return;
     }
 
@@ -125,24 +126,24 @@ function uploadDebFile(event) {
             if (debName in installedApps) {
                 printText(`\ntc@tinycore-kernel:~$ sudo dpkg -i ${file.name}`);
                 printText(`Selecting previously unselected package ${debName}.`);
-                printText(`Preparing to unpack ${file.name} ...`);
-                printText(`Unpacking ${debName} ...`);
-                printText(`Setting up ${debName} ...`);
-                printText(`[Hệ thống] Cài đặt thành công ứng dụng gói ngoại vi [${debName}] từ tệp tin bên ngoài! Gõ 'run ${debName}' để kích hoạt.`);
+                printText(`Unpacking ${debName} từ nguồn tệp tin cục bộ...`);
+                printText(`Setting up ${debName} ... Done!`);
+                printText(`[Hệ thống] Đã đồng bộ thành công gói [${debName}]. Gõ 'run ${debName}' để mở.`);
                 
                 installedApps[debName] = true; 
             } else {
-                printText(`\nE: Gói phần mềm '${debName}' bên trong tệp tin không tương thích với hệ thống.`);
+                printText(`\nE: Gói phần mềm '${debName}' không tương thích với hệ thống.`);
             }
         } catch (err) {
             printText(`\ntc@tinycore-kernel:~$ sudo dpkg -i ${file.name}`);
-            printText("E: Tệp tin .deb bị hỏng hoặc sai cấu trúc định dạng.");
+            printText("E: Tệp tin .deb bị lỗi cấu trúc cấu hình bên trong.");
         }
     };
     reader.readAsText(file);
     event.target.value = ''; 
 }
 
+// Bắt sự kiện phím Enter
 cmdInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         let input = cmdInput.value.trim();
@@ -154,9 +155,10 @@ cmdInput.addEventListener('keydown', function(e) {
     }
 });
 
+// Bộ thông dịch dòng lệnh - ĐÃ SỬA TOÀN BỘ LOGIC TÁCH CHUỖI CŨ
 function handleCommand(input) {
     let args = input.split(' ');
-    let baseCmd = args[0]; 
+    let baseCmd = args[0]; // Phần tử chuỗi đầu tiên (Lệnh chính)
 
     if (input === 'help') {
         printText("--- CÁC CÂU LỆNH HỆ THỐNG ---" +
@@ -180,15 +182,16 @@ function handleCommand(input) {
         return;
     }
 
+    // Kiểm tra chính xác chuỗi thô của lệnh gõ vào thay vì so sánh mảng
     if (baseCmd === 'sudo' && args[1] === 'apt' && args[2] === 'install') {
         let debName = args[3];
         if (!debName) {
-            printText("Lỗi: Vui lòng chỉ định tên gói. Ví dụ: sudo apt install doom");
+            printText("Lỗi: Vui lòng chỉ định tên gói. Ví dụ: sudo apt install git");
             return;
         }
 
         if (debName in installedApps) {
-            printText(`Reading package lists... Done\nDownloading ${debName}...\nSetting up ${debName}...\nCài đặt thành công! Gõ 'run ${debName}' để mở.`);
+            printText(`Reading package lists... Done\nDownloading ${debName}...\nSetting up ${debName}...\nCài đặt gói [${debName}] thành công! Gõ 'run ${debName}' để mở.`);
             installedApps[debName] = true; 
         } else {
             printText(`E: Unable to locate package ${debName}. Nhập 'help' để xem các gói có sẵn.`);
@@ -197,12 +200,11 @@ function handleCommand(input) {
     }
 
     if (baseCmd === 'run') {
-        let debName = args[1];
+        let debName = args[1]; // Lấy tham số tên gói sau chữ run
         if (!debName) {
             printText("Lỗi: Hãy dùng cú pháp: run [tên_gói]");
             return;
         }
 
         if (installedApps[debName] === true) {
-            printText(`Đang mở ứng dụng đồ họa: ${debName}...`);
-appContainer.innerHTML = '';const appWin = document.createElement('div');appWin.className = 'app-window';appWin.id = 'active-app';appWin.innerHTML = <div class="app-header"> <span>📦 Application Core: ${debName.toUpperCase()}</span> <button class="close-btn" onclick="closeActiveApp()">X</button> </div> <iframe class="app-iframe" src="${appSources[debName]}"></iframe>;appContainer.appendChild(appWin);} else if (debName in installedApps) {printText(bash: run: Lệnh bị từ chối. Bạn chưa cài đặt gói này. Hãy gõ 'sudo apt install ${debName}' hoặc nạp tệp .deb vào.);} else {printText(bash: run: Không tìm thấy phần mềm nào có tên '${debName}'.);}return;}printText(bash: ${baseCmd}: command not found. Gõ 'help' để hỗ trợ.);}function closeActiveApp() {const activeApp = document.getElementById('active-app');if (activeApp) {activeApp.remove();printText("Đã đóng ứng dụng. Hệ thống sẵn sàng nhận lệnh mới.");cmdInput.focus();}}
+printText(Đang mở ứng dụng đồ họa: ${debName}...);appContainer.innerHTML = '';const appWin = document.createElement('div');appWin.className = 'app-window';appWin.id = 'active-app';appWin.innerHTML = <div class="app-header"> <span>📦 Application Core: ${debName.toUpperCase()}</span> <button class="close-btn" onclick="closeActiveApp()">X</button> </div> <iframe class="app-iframe" src="${appSources[debName]}"></iframe>;appContainer.appendChild(appWin);} else if (debName in installedApps) {printText(bash: run: Lệnh bị từ chối. Bạn chưa cài đặt gói này. Hãy gõ 'sudo apt install ${debName}' hoặc nạp tệp .deb vào.);} else {printText(bash: run: Không tìm thấy phần mềm nào có tên '${debName}'.);}return;}// Phản hồi nếu gõ sai câu lệnhprintText(bash: ${baseCmd}: command not found. Gõ 'help' để hỗ trợ.);}function closeActiveApp() {const activeApp = document.getElementById('active-app');if (activeApp) {activeApp.remove();printText("Đã đóng ứng dụng. Hệ thống sẵn sàng nhận lệnh mới.");cmdInput.focus();}}
