@@ -2,241 +2,174 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>LinWinOS Desktop</title>
+    <title>Linux Pure Terminal</title>
     <style>
-        * { box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0c0c0c; color: #00ff00; font-family: 'Courier New', Courier, monospace; overflow: hidden; }
+        #terminal { width: 100%; height: 100%; padding: 15px; display: flex; flex-direction: column; box-sizing: border-box; }
+        #output { white-space: pre-wrap; word-wrap: break-word; flex: 1; overflow-y: auto; margin-bottom: 10px; }
+        #input-line { display: flex; align-items: center; }
+        #prompt { color: #10b981; font-weight: bold; margin-right: 8px; white-space: nowrap; }
+        #cmd { background: transparent; border: none; color: #ffffff; font-family: inherit; font-size: 16px; outline: none; flex: 1; }
         
-        /* Giao diện hình nền */
-        #desktop { width: 100%; height: calc(100% - 40px); background: linear-gradient(135deg, #4d1234 0%, #1e0b24 50%, #0f0714 100%); position: relative; }
-        
-        /* Icon màn hình chính */
-        .desktop-icon { position: absolute; top: 20px; left: 20px; width: 80px; text-align: center; color: white; cursor: pointer; text-shadow: 1px 1px 3px black; font-size: 12px; user-select: none; }
-        .desktop-icon .icon-placeholder { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 8px; margin: 0 auto 5px auto; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.3); }
-        .desktop-icon:hover .icon-placeholder { background: rgba(255,255,255,0.4); }
-
-        /* Cửa sổ giao diện chuẩn Windows */
-        .window { position: absolute; width: 700px; height: 450px; background: #252526; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; border-radius: 6px; overflow: hidden; z-index: 10; }
-        .window-header { background: #1e1e1e; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; user-select: none; }
-        .window-title { color: #d4d4d4; font-size: 13px; font-weight: 500; }
-        .window-controls { display: flex; gap: 8px; }
-        .win-btn { width: 14px; height: 14px; border-radius: 50%; border: none; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; color: transparent; font-weight: bold; }
-        .win-btn:hover { color: #000; }
-        .btn-close { background: #ff5f56; }
-        .btn-minimize { background: #ffbd2e; }
-        .btn-maximize { background: #27c93f; }
-        .window-body { flex: 1; background: #1e1e1e; position: relative; }
-        .win-iframe { width: 100%; height: 100%; border: none; background: white; }
-
-        /* Màn hình dòng lệnh Terminal Linux */
-        .terminal-body { width: 100%; height: 100%; padding: 10px; color: #00ff00; font-family: 'Courier New', monospace; overflow-y: auto; font-size: 14px; background: #0c0c0c; }
-        .terminal-output { white-space: pre-wrap; word-wrap: break-word; }
-        .terminal-input-line { display: flex; align-items: center; margin-top: 5px; }
-        .terminal-prompt { color: #10b981; margin-right: 6px; font-weight: bold; }
-        .terminal-cmd { background: transparent; border: none; color: #fff; font-family: inherit; font-size: inherit; outline: none; flex: 1; }
-
-        /* Thanh Taskbar phía dưới */
-        #taskbar { width: 100%; height: 40px; background: #101010; border-top: 1px solid #252526; display: flex; align-items: center; padding: 0 10px; position: absolute; bottom: 0; z-index: 1000; }
-        #start-button { background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; font-size: 13px; cursor: pointer; margin-right: 10px; }
-        #taskbar-apps { display: flex; gap: 6px; flex: 1; }
-        .taskbar-item { background: #262626; color: #e5e5e5; padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid #404040; }
-        #system-clock { color: #a3a3a3; font-size: 12px; font-family: monospace; }
+        /* Khung Iframe ứng dụng khi được RUN */
+        .app-window { width: 100%; height: 80%; border: 2px solid #333; margin-top: 15px; display: flex; flex-direction: column; background: #252526; border-radius: 4px; }
+        .app-header { background: #1e1e1e; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; color: #d4d4d4; font-size: 13px; }
+        .close-btn { background: #ff5f56; border: none; color: white; border-radius: 50%; width: 16px; height: 16px; cursor: pointer; font-size: 10px; line-height: 16px; text-align: center; }
+        .app-iframe { flex: 1; border: none; background: white; }
     </style>
 </head>
 <body>
 
-<div id="desktop">
-    <div class="desktop-icon" onclick="openWindow('terminal')">
-        <div class="icon-placeholder">🐚</div>
-        Terminal
+<div id="terminal">
+    <div id="output">Chào mừng đến với Tinycore-Kernel Terminal! Gõ 'help' để xem danh sách lệnh Linux.</div>
+    
+    <div id="app-container"></div>
+
+    <div id="input-line">
+        <span id="prompt">tc@tinycore-kernel:~$</span>
+        <input type="text" id="cmd" autofocus autocomplete="off">
     </div>
 </div>
 
-<div id="taskbar">
-    <button id="start-button" onclick="openWindow('terminal')">💻 Applications</button>
-    <div id="taskbar-apps"></div>
-    <div id="system-clock">00:00:00</div>
-</div>
-
 <script>
-let windowCounter = 0;
+const cmdInput = document.getElementById('cmd');
+const output = document.getElementById('output');
+const appContainer = document.getElementById('app-container');
 
-function updateClock() {
-    const now = new Date();
-    document.getElementById('system-clock').innerText = now.toTimeString().split(' ')[0];
-}
-setInterval(updateClock, 1000);
-updateClock();
+// Danh sách trạng thái cài đặt phần mềm (Mặc định là false - chưa cài)
+let installedApps = {
+    'game': false, 'tetris': false,
+    'minecraft': false, 'eaglecraft': false,
+    'doom': false, 'browser': false,
+    'filemanager': false, 'texteditor': false
+};
 
-// HÀM KHỞI TẠO CỬA SỔ (BẮT BUỘC PHẢI CÓ)
-function openWindow(type) {
-    windowCounter++;
-    const desktop = document.getElementById('desktop');
-    const win = document.createElement('div');
-    win.className = 'window';
-    win.id = `win-${windowCounter}`;
-    win.style.top = `${60 + (windowCounter % 5) * 25}px`;
-    win.style.left = `${100 + (windowCounter % 5) * 35}px`;
+// Đường dẫn Iframe của các gói phần mềm
+const appSources = {
+    'game': 'https://cloudcmd.io',
+    'tetris': 'https://cloudcmd.io',
+    'minecraft': 'https://vse.gq',
+    'eaglecraft': 'https://vse.gq',
+    'doom': 'https://dos.zone',
+    'browser': 'https://bing.com',
+    'filemanager': 'https://cloudcmd.io',
+    'texteditor': 'data:text/html,<body style="margin:0;"><textarea style="width:100vw;height:100vh;background:%231e1e1e;color:%23fff;font-family:monospace;padding:15px;box-sizing:border-box;border:none;outline:none;" placeholder="Gedit Text Editor..."></textarea></body>'
+};
 
-    let title = type.toUpperCase();
-    let bodyContent = "";
-
-    if (type === 'terminal') {
-        title = "tc@tinycore-kernel: ~";
-        bodyContent = `
-            <div class="terminal-body" id="term-body-${windowCounter}">
-                <div class="terminal-output" id="term-out-${windowCounter}">Chào mừng đến với LinWin OS Terminal!\nGõ 'help' để xem danh sách lệnh.</div>
-                <div class="terminal-input-line">
-                    <span class="terminal-prompt">tc@tinycore-kernel:~$</span>
-                    <input type="text" class="terminal-cmd" id="term-cmd-${windowCounter}" autofocus autocomplete="off" onkeydown="handleTerminalKey(event, ${windowCounter})">
-                </div>
-            </div>`;
-    } 
-    else if (type === 'browser') {
-        title = "Trình duyệt Web (Bing)";
-        bodyContent = `<iframe class="win-iframe" src="https://bing.com"></iframe>`;
-    } 
-    else if (type === 'minecraft') {
-        title = "Minecraft Eaglecraft";
-        bodyContent = `<iframe class="win-iframe" src="https://vse.gq"></iframe>`;
-    } 
-    else if (type === 'doom') {
-        title = "Linux DOOM Classic";
-        bodyContent = `<iframe class="win-iframe" src="https://dos.zone"></iframe>`;
-    } 
-    else if (type === 'filemanager') {
-        title = "Trình quản lý tệp tin";
-        bodyContent = `<iframe class="win-iframe" src="https://cloudcmd.io"></iframe>`;
-    } 
-    else if (type === 'texteditor') {
-        title = "Gedit Text Editor";
-        bodyContent = `<div style="width:100%; height:100%; background:#2d2d2d; padding:10px;"><textarea style="width:100%; height:100%; background:#1e1e1e; color:#fff; border:1px solid #444; font-family:monospace; padding:10px; resize:none; outline:none;"></textarea></div>`;
-    }
-
-    win.innerHTML = `
-        <div class="window-header" onmousedown="dragElement(this.parentElement)">
-            <span class="window-title">💻 ${title}</span>
-            <div class="window-controls">
-                <button class="win-btn btn-minimize" onclick="minimizeWin('${win.id}')">-</button>
-                <button class="win-btn btn-maximize" onclick="maximizeWin('${win.id}')">⬜</button>
-                <button class="win-btn btn-close" onclick="closeWin('${win.id}')">X</button>
-            </div>
-        </div>
-        <div class="window-body">${bodyContent}</div>
-    `;
-
-    desktop.appendChild(win);
-    dragElement(win);
-    
-    const input = document.getElementById(`term-cmd-${windowCounter}`);
-    if (input) input.focus();
-
-    addToTaskbar(win.id, title);
+function printText(text) {
+    output.innerText += "\n" + text;
+    output.scrollTop = output.scrollHeight;
 }
 
-function closeWin(id) { document.getElementById(id).remove(); document.getElementById(`task-${id}`).remove(); }
-function minimizeWin(id) { const win = document.getElementById(id); win.style.display = win.style.display === 'none' ? 'flex' : 'none'; }
-function maximizeWin(id) { const win = document.getElementById(id); if (win.style.width === '100%') { win.style.width = '700px'; win.style.height = '450px'; } else { win.style.width = '100%'; win.style.height = '100%'; win.style.top = '0'; win.style.left = '0'; } }
-function addToTaskbar(id, title) { const taskbarApps = document.getElementById('taskbar-apps'); const taskItem = document.createElement('div'); taskItem.className = 'taskbar-item'; taskItem.id = `task-${id}`; taskItem.innerText = title; taskItem.onclick = () => minimizeWin(id); taskbarApps.appendChild(taskItem); }
-
-// BỘ XỬ LÝ LỆNH TERMINAL CHÍNH XÁC KHÔNG LỖI CÚ PHÁP
-function handleTerminalKey(event, winIndex) {
-    if (event.key === 'Enter') {
-        const cmdInput = document.getElementById(`term-cmd-${winIndex}`);
-        const output = document.getElementById(`term-out-${winIndex}`);
+cmdInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
         let input = cmdInput.value.trim();
         cmdInput.value = '';
-
         if (input === '') return;
 
-        output.innerText += `\ntc@tinycore-kernel:~$ ${input}`;
-        
-        // Bóc tách câu lệnh chuẩn xác
-        let args = input.split(' ');
-        let baseCmd = args[0]; // Lệnh đầu tiên (ví dụ: open, clear)
-        let targetApp = args[1]; // Tham số thứ 2 (ví dụ: browser, doom)
+        printText("tc@tinycore-kernel:~$ " + input);
+        handleCommand(input);
+    }
+});
 
-        if (input === 'help') {
-            output.innerText += "\n--- CÁC CÂU LỆNH HỆ THỐNG ---\n• Hệ thống: help, neofetch, clear, date, whoami, uptime\n• Cài đặt: sudo apt update, sudo apt install [game / minecraft / doom]\n• Mở đồ họa: open [browser / filemanager / texteditor / minecraft / doom]";
-        } else if (input === 'neofetch') {
-            output.innerText += "\n   /\\_/\\     tc@linwin-node\n  ( o.o )    --------------\n   > ^ <     OS: LinWin OS Core v2.0\n             Kernel: Linux 6.2.0-custom-hybrid\n             CPU: Virtual x86 Processor (8 Cores)\n             Memory: 4096MB / 16384MB";
-        } else if (input === 'clear') {
-            output.innerText = 'Màn hình Terminal đã được xóa.';
-        } else if (input === 'date') {
-            output.innerText += `\n${new Date().toString()}`;
-        } else if (input === 'whoami') {
-            output.innerText += "\ntc";
-        } else if (input === 'uptime') {
-            output.innerText += "\nup 45 minutes, 1 active session, load average: 0.12";
-        } else if (input === 'sudo apt update') {
-            output.innerText += "\nGet:1 http://linwin.org InRelease [15.4 kB]\nReading package lists... Done.\nAll extensions and applications are ready to launch.";
-        } else if (input === 'sudo apt install game' || input === 'sudo apt install tetris') {
-            output.innerText += "\nDownloading assets...\nUnpacking package tree...\nCài đặt hoàn tất! Gõ 'open texteditor' hoặc dùng 'open browser'.";
-        } else if (input === 'sudo apt install minecraft' || input === 'sudo apt install eaglecraft') {
-            output.innerText += "\nFetching Eaglecraft client source from network...\nCài đặt Minecraft thành công! Gõ lệnh 'open minecraft' để bắt đầu chơi.";
-        } else if (input === 'sudo apt install doom') {
-            output.innerText += "\nLoading DOOM Shareware contents...\nCài đặt DOOM thành công! Gõ 'open doom' để chiến đấu.";
-        } 
-        // SỬA LỖI TÁCH CHUỖI VÀ BỌC DẤU NHÁY TẠI ĐÂY
-        else if (baseCmd === 'open') {
-            if (['browser', 'filemanager', 'texteditor', 'minecraft', 'doom'].includes(targetApp)) {
-                output.innerText += `\nĐang mở ứng dụng đồ họa: ${targetApp}...`;
-                openWindow(targetApp);
-            } else {
-                output.innerText += `\nKhông tìm thấy ứng dụng đồ họa có tên '${targetApp || ''}'. Thử: open [browser, minecraft, doom, filemanager, texteditor]`;
-            }
+function handleCommand(input) {
+    let args = input.split(' ');
+    let baseCmd = args[0]; 
+
+    // 1. NHÓM LỆNH HỆ THỐNG
+    if (input === 'help') {
+        printText("--- CÁC CÂU LỆNH HỆ THỐNG ---" +
+                  "\n• Hệ thống: help, neofetch, clear, date, whoami, uptime" +
+                  "\n• Cài đặt: sudo apt update, sudo apt install [tên_gói]" +
+                  "\n• Khởi chạy: run [tên_gói] (Cần cài đặt trước)" +
+                  "\n• Gói có sẵn: game, tetris, minecraft, eaglecraft, doom, browser, filemanager, texteditor");
+        return;
+    }
+    if (input === 'neofetch') {
+        printText("   /\\_/\\     tc@tinycore-kernel\n  ( o.o )    ------------------\n   > ^ <     OS: Tinycore Pure Terminal\n             Kernel: Linux 6.2.0-generic\n             Shell: bash v5.1\n             CPU: Virtual Core i7 (4 Cores)\n             Memory: 2048MB / 8192MB");
+        return;
+    }
+    if (input === 'clear') {
+        output.innerText = 'Màn hình Terminal đã được làm sạch.';
+        return;
+    }
+    if (input === 'date') {
+        printText(new Date().toString());
+        return;
+    }
+    if (input === 'whoami') {
+        printText("tc");
+        return;
+    }
+    if (input === 'uptime') {
+        printText("up 1 hour, 1 active user, load average: 0.05");
+        return;
+    }
+
+    // 2. XỬ LÝ LỆNH SUDO APT UPDATE VÀ INSTALL
+    if (input === 'sudo apt update') {
+        printText("Get:1 http://tinycore.org stable InRelease [12.4 kB]\nGet:2 http://tinycore.org stable/main amd64 Packages [150 kB]\nFetched 162.4 kB in 1s (162 kB/s)\nReading package lists... Done.\nAll package definitions are up to date.");
+        return;
+    }
+
+    if (baseCmd === 'sudo' && args[1] === 'apt' && args[2] === 'install') {
+        let debName = args[3];
+        if (!debName) {
+            printText("Lỗi: Vui lòng chỉ định tên gói. Ví dụ: sudo apt install doom");
+            return;
+        }
+
+        if (debName in installedApps) {
+            printText(`Reading package lists... Done\nBuilding dependency tree... Done\nDownloading ${debName}...\nUnpacking ${debName}...\nSetting up ${debName}...\nCài đặt thành công! Gõ 'run ${debName}' để mở.`);
+            installedApps[debName] = true; 
         } else {
-            output.innerText += `\nbash: ${baseCmd}: command not found. Nhập 'help' để xem danh sách.`;
+            printText(`E: Unable to locate package ${debName}. Nhập 'help' để xem các gói có sẵn.`);
+        }
+        return;
+    }
+
+    // 3. LỆNH RUN KHỞI CHẠY ỨNG DỤNG
+    if (baseCmd === 'run') {
+        let debName = args[1];
+        if (!debName) {
+            printText("Lỗi: Hãy dùng cú pháp: run [tên_gói]");
+            return;
         }
 
-        // Bọc dấu nháy huyền chính xác cho ID phần tử
-        const termBody = document.getElementById(`term-body-${winIndex}`);
-        if (termBody) {
-            termBody.scrollTop = termBody.scrollHeight;
+        if (installedApps[debName] === true) {
+            printText(`Đang mở ứng dụng đồ họa: ${debName}...`);
+            appContainer.innerHTML = ''; 
+
+            const appWin = document.createElement('div');
+            appWin.className = 'app-window';
+            appWin.id = 'active-app';
+            appWin.innerHTML = `
+                <div class="app-header">
+                    <span>📦 Application Core: ${debName.toUpperCase()}</span>
+                    <button class="close-btn" onclick="closeActiveApp()">X</button>
+                </div>
+                <iframe class="app-iframe" src="${appSources[debName]}"></iframe>
+            `;
+            appContainer.appendChild(appWin);
+        } else if (debName in installedApps) {
+            printText(`bash: run: Lệnh bị từ chối. Bạn chưa cài đặt gói này. Hãy gõ 'sudo apt install ${debName}' trước.`);
+        } else {
+            printText(`bash: run: Không tìm thấy phần mềm nào có tên '${debName}'.`);
         }
+        return;
     }
+
+    printText(`bash: ${baseCmd}: command not found. Gõ 'help' để hỗ trợ.`);
 }
 
-// Hàm xử lý kéo thả cửa sổ hoàn chỉnh không lỗi
-function dragElement(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    const header = elmnt.querySelector('.window-header');
-    if (header) { 
-        header.onmousedown = dragMouseDown; 
-    }
-
-    function dragMouseDown(e) {
-        e = e || window.event;
-        if (e.target.closest('.window-controls')) return;
-        e.preventDefault();
-        pos3 = e.clientX; 
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-        document.querySelectorAll('.window').forEach(w => w.style.zIndex = 10);
-        elmnt.style.zIndex = 100;
-    }
-
-    function elementDrag(e) {
-        e = e || window.event; 
-        e.preventDefault();
-        pos1 = pos3 - e.clientX; 
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX; 
-        pos4 = e.clientY;
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; 
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-
-    function closeDragElement() { 
-        document.onmouseup = null; 
-        document.onmousemove = null; 
+function closeActiveApp() {
+    const activeApp = document.getElementById('active-app');
+    if (activeApp) {
+        activeApp.remove();
+        printText("Đã đóng ứng dụng. Hệ thống sẵn sàng nhận lệnh mới.");
+        cmdInput.focus();
     }
 }
-
-// Tự động mở cửa sổ dòng lệnh ngay khi vừa bật trang lên
-window.onload = () => {
-    if (typeof openWindow === "function") {
-        openWindow('terminal');
-    }
-};
+</script>
+</body>
+</html>
