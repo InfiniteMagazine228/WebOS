@@ -1,199 +1,414 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Linux Pure Terminal - Fixed Perfect</title>
-    <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0c0c0c; color: #00ff00; font-family: 'Courier New', Courier, monospace; overflow: hidden; }
-        #terminal { width: 100%; height: 100%; padding: 15px; display: flex; flex-direction: column; box-sizing: border-box; position: relative; }
-        #output { white-space: pre-wrap; word-wrap: break-word; flex: 1; overflow-y: auto; margin-bottom: 10px; }
-        #input-line { display: flex; align-items: center; }
-        #prompt { color: #10b981; font-weight: bold; margin-right: 8px; white-space: nowrap; }
-        #cmd { background: transparent; border: none; color: #ffffff; font-family: inherit; font-size: 16px; outline: none; flex: 1; }
-        
-        .app-window { width: 100%; height: 80%; border: 2px solid #333; margin-top: 15px; display: flex; flex-direction: column; background: #252526; border-radius: 4px; }
-        .app-header { background: #1e1e1e; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; color: #d4d4d4; font-size: 13px; }
-        .close-btn { background: #ff5f56; border: none; color: white; border-radius: 50%; width: 16px; height: 16px; cursor: pointer; font-size: 10px; line-height: 16px; text-align: center; }
-        .app-iframe { flex: 1; border: none; background: white; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebOS</title>
 
-        #deb-control-panel { position: absolute; top: 15px; right: 15px; background: rgba(30, 30, 30, 0.85); border: 1px solid #444; padding: 10px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-family: sans-serif; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .panel-title { color: #aaa; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; text-align: center; }
-        .deb-btn { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; transition: background 0.2s; text-align: center; }
-        .deb-btn:hover { background: #3b82f6; }
-        .deb-btn.download { background: #059669; }
-        .deb-btn.download:hover { background: #10b981; }
-        #file-input { display: none; }
-        .deb-select { background: #111; color: #00ff00; border: 1px solid #444; font-family: monospace; font-size: 12px; padding: 4px; border-radius: 4px; outline: none; }
-    </style>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    font-family:monospace;
+}
+
+#desktop{
+    width:100vw;
+    height:100vh;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+    padding:20px;
+}
+
+.icon{
+    width:90px;
+    text-align:center;
+    margin-bottom:20px;
+    cursor:pointer;
+    user-select:none;
+}
+
+.icon:hover{
+    background:rgba(255,255,255,.1);
+    border-radius:10px;
+}
+
+.icon img{
+    font-size:40px;
+}
+
+.window{
+    position:absolute;
+    top:80px;
+    left:120px;
+    width:800px;
+    height:500px;
+    background:black;
+    border:1px solid #444;
+    display:none;
+}
+
+.titlebar{
+    height:35px;
+    background:#222;
+    color:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 10px;
+}
+
+.close-btn{
+    background:red;
+    border:none;
+    color:white;
+    width:30px;
+    height:25px;
+    cursor:pointer;
+}
+
+#terminal{
+    color:#00ff00;
+    padding:10px;
+    height:calc(100% - 35px);
+    overflow-y:auto;
+}
+
+.input-line{
+    display:flex;
+}
+
+.input-line input{
+    background:black;
+    color:#00ff00;
+    border:none;
+    outline:none;
+    width:100%;
+    font-family:monospace;
+}
+
+.app-window{
+    position:absolute;
+    top:120px;
+    left:180px;
+    width:900px;
+    height:600px;
+    background:white;
+    display:none;
+    border:1px solid #444;
+}
+
+.app-content{
+    height:calc(100% - 35px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:32px;
+}
+</style>
 </head>
+
 <body>
 
-<div id="terminal" onclick="document.getElementById('cmd').focus()">
-    <!-- Hộp tiện ích điều khiển .DEB -->
-    <div id="deb-control-panel" onclick="event.stopPropagation()">
-        <div class="panel-title">Hộp tiện ích .DEB</div>
-        <select id="package-selector" class="deb-select">
-            <option value="git">git.deb</option>
-            <option value="minecraft">minecraft.deb</option>
-            <option value="doom">doom.deb</option>
-            <option value="browser">browser.deb</option>
-            <option value="filemanager">filemanager.deb</option>
-            <option value="texteditor">texteditor.deb</option>
-            <option value="game">game.deb</option>
-        </select>
-        <button class="deb-btn download" onclick="downloadDebFile()">💾 Tải gói .deb về máy</button>
-        <button class="deb-btn" onclick="document.getElementById('file-input').click()">📂 Nạp tệp .deb vào máy</button>
-        <input type="file" id="file-input" accept=".deb" onchange="uploadDebFile(event)">
+<div id="desktop">
+
+    <div class="icon" onclick="openTerminal()">
+        💻
+        <div>Terminal</div>
     </div>
 
-    <div id="output">Chào mừng đến với Tinycore-Kernel Terminal! Gõ 'help' để xem danh sách lệnh Linux.</div>
-    <div id="app-container"></div>
+    <div id="apps"></div>
 
-    <div id="input-line">
-        <span id="prompt">tc@tinycore-kernel:~$</span>
-        <input type="text" id="cmd" autofocus autocomplete="off">
+</div>
+
+<!-- TERMINAL -->
+
+<div class="window" id="terminalWindow">
+
+    <div class="titlebar">
+        <span>Terminal</span>
+
+        <button class="close-btn"
+                onclick="closeTerminal()">X</button>
     </div>
+
+    <div id="terminal"></div>
+
+</div>
+
+<!-- APP WINDOW -->
+
+<div class="app-window" id="appWindow">
+
+    <div class="titlebar">
+        <span id="appTitle">App</span>
+
+        <button class="close-btn"
+                onclick="closeApp()">X</button>
+    </div>
+
+    <div class="app-content" id="appContent">
+    </div>
+
 </div>
 
 <script>
-const cmdInput = document.getElementById('cmd');
-const output = document.getElementById('output');
-const appContainer = document.getElementById('app-container');
 
-// Khai báo bộ nhớ ảo quản lý cài đặt app
-let installedApps = {
-    'git': false, 'game': false, 'tetris': false,
-    'minecraft': false, 'eaglecraft': false,
-    'doom': false, 'browser': false,
-    'filemanager': false, 'texteditor': false
-};
+const terminal =
+document.getElementById("terminal");
 
-// Khai báo danh sách URL nhúng ứng dụng đồ họa
-const appSources = {
-    'git': 'https://github.com',
-    'game': 'https://cloudcmd.io',
-    'tetris': 'https://cloudcmd.io',
-    'minecraft': 'https://vse.gq',
-    'eaglecraft': 'https://vse.gq',
-    'doom': 'https://dos.zone',
-    'browser': 'https://bing.com',
-    'filemanager': 'https://cloudcmd.io',
-    'texteditor': 'data:text/html,<body style="margin:0;"><textarea style="width:100vw;height:100vh;background:%231e1e1e;color:%23fff;font-family:monospace;padding:15px;box-sizing:border-box;border:none;outline:none;" placeholder="Gedit Text Editor..."></textarea></body>'
-};
+const installedPackages = [];
 
-function printText(text) {
-    output.innerText += "\n" + text;
-    output.scrollTop = output.scrollHeight;
+function openTerminal(){
+    document.getElementById(
+      "terminalWindow"
+    ).style.display="block";
+
+    if(!terminal.innerHTML){
+        printLine("Welcome to WebOS");
+        printLine("Type 'help'");
+        newPrompt();
+    }
 }
 
-// Hàm tải tệp tin cấu hình .deb xuống máy thật
-function downloadDebFile() {
-    const selectedPkg = document.getElementById('package-selector').value;
-    const debContent = JSON.stringify({
-        packageName: selectedPkg,
-        sourceUrl: appSources[selectedPkg]
-    }, null, 2);
-
-    const blob = new Blob([debContent], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = selectedPkg + ".deb";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    printText("[Hệ thống] Đã xuất và tải xuống tệp tin: " + selectedPkg + ".deb");
+function closeTerminal(){
+    document.getElementById(
+      "terminalWindow"
+    ).style.display="none";
 }
 
-// Hàm nạp tệp tin .deb lên hệ thống từ máy thật
-function uploadDebFile(event) {
-    const file = event.target.files[0]; // Sửa triệt để chỉ mục lấy file [0]
-    if (!file) return;
-
-    if (!file.name.endsWith('.deb')) {
-        printText("E: Định dạng tệp không hợp lệ. Hệ thống chỉ chấp nhận đuôi mở rộng .deb");
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const pkgData = JSON.parse(e.target.result);
-            const debName = pkgData.packageName;
-
-            if (debName in installedApps) {
-                printText("\ntc@tinycore-kernel:~$ sudo dpkg -i " + file.name);
-                printText("Selecting previously unselected package " + debName + ".");
-                printText("Unpacking " + debName + " ...");
-                printText("Setting up " + debName + " ... Done!");
-                printText("[Hệ thống] Nạp thành công tệp ngoại vi [" + debName + "]. Gõ 'run " + debName + "' để mở.");
-                
-                installedApps[debName] = true; 
-            } else {
-                printText("\nE: Gói phần mềm '" + debName + "' bên trong tệp tin không tương thích.");
-            }
-        } catch (err) {
-            printText("\ntc@tinycore-kernel:~$ sudo dpkg -i " + file.name);
-            printText("E: Tệp tin .deb bị hỏng hoặc lỗi định dạng JSON bên trong.");
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = ''; 
+function printLine(text){
+    terminal.innerHTML += text + "<br>";
+    terminal.scrollTop =
+    terminal.scrollHeight;
 }
 
-// Lắng nghe phím Enter chuẩn không crash script
-cmdInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        let input = cmdInput.value.trim();
-        cmdInput.value = '';
-        if (input === '') return;
+function newPrompt(){
 
-        printText("tc@tinycore-kernel:~$ " + input);
-        handleCommand(input);
-    }
-});
+    const line =
+    document.createElement("div");
 
-// Bộ xử lý dòng lệnh đã tối ưu hóa, loại bỏ hoàn toàn các lỗi mảng ẩn
-function handleCommand(input) {
-    let args = input.split(' ');
-    let baseCmd = args[0]; // Lệnh đầu tiên (ví dụ: run, clear, help)
+    line.className = "input-line";
 
-    if (input === 'help') {
-        printText("--- CÁC CÂU LỆNH HỆ THỐNG ---" +
-                  "\n• Hệ thống: help, neofetch, clear, date, whoami, uptime" +
-                  "\n• Cài đặt: sudo apt update, sudo apt install [tên_gói]" +
-                  "\n• Khởi chạy: run [tên_gói] (Cần cài đặt hoặc nạp file .deb trước)" +
-                  "\n• Gói có sẵn: git, game, tetris, minecraft, eaglecraft, doom, browser, filemanager, texteditor");
-        return;
-    }
-    
-    if (input === 'neofetch') {
-        printText("   /\\_/\\     tc@tinycore-kernel\n  ( o.o )    ------------------\n   > ^ <     OS: Tinycore Pure Terminal\n             Kernel: Linux 6.2.0-generic\n             Shell: bash v5.1\n             CPU: Virtual Core i7 (4 Cores)\n             Memory: 2048MB / 8192MB");
-        return;
-    }
-    
-    if (input === 'clear') { output.innerText = 'Màn hình Terminal đã được làm sạch.'; return; }
-    if (input === 'date') { printText(new Date().toString()); return; }
-    if (input === 'whoami') { printText("tc"); return; }
-    if (input === 'uptime') { printText("up 1 hour, 1 active user, load average: 0.05"); return; }
-    
-    if (input === 'sudo apt update') {
-        printText("Get:1 http://tinycore.org stable InRelease [12.4 kB]\nReading package lists... Done.\nAll package definitions are up to date.");
-        return;
-    }
+    line.innerHTML = `
+    <span>webos@localhost:~$&nbsp;</span>
+    <input autofocus>
+    `;
 
-    // Kiểm tra lệnh cài đặt bằng chuỗi text thô ghép lại để chống crash
-    if (input.startsWith('sudo apt install')) {
-        let debName = args[3]; // Lấy phần tử thứ 4 trong chuỗi nhập vào làm tên gói
-        if (!debName) {
-            printText("Lỗi: Vui lòng chỉ định tên gói. Ví dụ: sudo apt install doom");
-            return;
+    terminal.appendChild(line);
+
+    const input =
+    line.querySelector("input");
+
+    input.focus();
+
+    input.addEventListener(
+      "keydown",
+      function(e){
+
+        if(e.key==="Enter"){
+
+            const cmd = input.value;
+
+            input.disabled = true;
+
+            execute(cmd);
+
+            newPrompt();
         }
 
-        if (debName in installedApps) {
-            printText("Reading package lists... Done\nDownloading " + debName + "...\nSetting up " + debName + "...\nCài đặt gói [" + debName + "] thành công! Gõ 'run " + debName + "' để mở.");
-            installedApps[debName] = true; 
-        } else {
-printText("E: Unable to locate package " + debName + ". Nhập 'help' để xem các gói có sẵn.");}return;}// Kiểm tra lệnh run khởi chạy ứng dụng iframeif (baseCmd === 'run') {let debName = args[1]; // Lấy phần tử thứ 2 sau chữ run làm tên góiif (!debName) {printText("Lỗi: Hãy dùng cú pháp: run [tên_gói]");return;}if (installedApps[debName] === true) {printText("Đang mở ứng dụng đồ họa: " + debName + "...");appContainer.innerHTML = '';const appWin = document.createElement('div');appWin.className = 'app-window';appWin.id = 'active-app';appWin.innerHTML = <div class="app-header"> <span>📦 Application Core: + debName.toUpperCase() + </span> <button class="close-btn" onclick="closeActiveApp()">X</button> </div> <iframe class="app-iframe" src=" + appSources[debName] + "></iframe> ;appContainer.appendChild(appWin);} else if (debName in installedApps) {printText("bash: run: Lệnh bị từ chối. Bạn chưa cài đặt hoặc chưa nạp tệp " + debName + ".deb lên.");} else {printText("bash: run: Không tìm thấy phần mềm nào có tên '" + debName + "'.");}return;}printText("bash: " + baseCmd + ": command not found. Gõ 'help' để hỗ trợ.");}function closeActiveApp() {const activeApp = document.getElementById('active-app');if (activeApp) {activeApp.remove();printText("Đã đóng ứng dụng. Hệ thống sẵn sàng nhận lệnh mới.");cmdInput.focus();}}
+      }
+    );
+
+    terminal.scrollTop =
+    terminal.scrollHeight;
+}
+
+function execute(cmd){
+
+    if(cmd==="help"){
+
+        printLine(`
+Commands:<br>
+help<br>
+clear<br>
+sudo apt update<br>
+sudo apt install minecraft<br>
+sudo apt install doom
+`);
+
+        return;
+    }
+
+    if(cmd==="clear"){
+
+        terminal.innerHTML="";
+        return;
+    }
+
+    if(cmd==="sudo apt update"){
+
+        printLine(
+        "Hit:1 webos-main"
+        );
+
+        printLine(
+        "Hit:2 webos-games"
+        );
+
+        printLine(
+        "Reading package lists... Done"
+        );
+
+        return;
+    }
+
+    if(cmd==="sudo apt install minecraft"){
+
+        installPackage(
+        "minecraft",
+        "🟩"
+        );
+
+        return;
+    }
+
+    if(cmd==="sudo apt install doom"){
+
+        installPackage(
+        "doom",
+        "🔥"
+        );
+
+        return;
+    }
+
+    if(cmd==="minecraft"){
+
+        launchApp(
+        "Minecraft",
+        "Minecraft Clone (Eaglercraft)"
+        );
+
+        return;
+    }
+
+    if(cmd==="doom"){
+
+        launchApp(
+        "DOOM",
+        "DOOM HTML5"
+        );
+
+        return;
+    }
+
+    printLine(
+    cmd + ": command not found"
+    );
+}
+
+function installPackage(name, icon){
+
+    if(installedPackages.includes(name)){
+
+        printLine(
+        name + " already installed"
+        );
+
+        return;
+    }
+
+    installedPackages.push(name);
+
+    printLine(
+    "Installing " + name + "..."
+    );
+
+    printLine(
+    "Done."
+    );
+
+    createDesktopIcon(
+    name,
+    icon
+    );
+}
+
+function createDesktopIcon(
+name,
+icon
+){
+
+    const apps =
+    document.getElementById("apps");
+
+    const div =
+    document.createElement("div");
+
+    div.className="icon";
+
+    div.innerHTML=`
+        ${icon}
+        <div>${name}</div>
+    `;
+
+    div.onclick=
+    ()=>launchInstalled(name);
+
+    apps.appendChild(div);
+}
+
+function launchInstalled(name){
+
+    if(name==="minecraft"){
+
+        launchApp(
+        "Minecraft",
+        "Minecraft Clone (Eaglercraft)"
+        );
+    }
+
+    if(name==="doom"){
+
+        launchApp(
+        "DOOM",
+        "DOOM HTML5"
+        );
+    }
+}
+
+function launchApp(
+title,
+content
+){
+
+    document.getElementById(
+    "appTitle"
+    ).textContent=title;
+
+    document.getElementById(
+    "appContent"
+    ).innerHTML=content;
+
+    document.getElementById(
+    "appWindow"
+    ).style.display="block";
+}
+
+function closeApp(){
+
+    document.getElementById(
+    "appWindow"
+    ).style.display="none";
+}
+
+</script>
+
+</body>
+</html>
