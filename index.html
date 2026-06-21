@@ -2,113 +2,99 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WebOS</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
 body{
-    overflow:hidden;
-    font-family:monospace;
+  margin:0;
+  font-family:monospace;
+  overflow:hidden;
 }
 
 #desktop{
-    width:100vw;
-    height:100vh;
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:white;
-    padding:20px;
+  width:100vw;
+  height:100vh;
+  background:#0f172a;
+  color:white;
+  padding:15px;
 }
 
 .icon{
-    width:90px;
-    text-align:center;
-    margin-bottom:20px;
-    cursor:pointer;
-    user-select:none;
+  width:90px;
+  padding:10px;
+  margin:10px;
+  cursor:pointer;
+  text-align:center;
+  user-select:none;
+  border-radius:8px;
 }
 
 .icon:hover{
-    background:rgba(255,255,255,.1);
-    border-radius:10px;
-}
-
-.icon img{
-    font-size:40px;
+  background:rgba(255,255,255,0.1);
 }
 
 .window{
-    position:absolute;
-    top:80px;
-    left:120px;
-    width:800px;
-    height:500px;
-    background:black;
-    border:1px solid #444;
-    display:none;
+  position:absolute;
+  top:60px;
+  left:120px;
+  width:800px;
+  height:500px;
+  background:black;
+  border:1px solid #444;
+  display:none;
 }
 
 .titlebar{
-    height:35px;
-    background:#222;
-    color:white;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 10px;
+  height:35px;
+  background:#222;
+  color:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 10px;
 }
 
-.close-btn{
-    background:red;
-    border:none;
-    color:white;
-    width:30px;
-    height:25px;
-    cursor:pointer;
+.close{
+  background:red;
+  border:none;
+  color:white;
+  cursor:pointer;
+  width:30px;
 }
 
 #terminal{
-    color:#00ff00;
-    padding:10px;
-    height:calc(100% - 35px);
-    overflow-y:auto;
+  height:calc(100% - 35px);
+  color:#00ff00;
+  padding:10px;
+  overflow:auto;
 }
 
-.input-line{
-    display:flex;
+.input{
+  display:flex;
 }
 
-.input-line input{
-    background:black;
-    color:#00ff00;
-    border:none;
-    outline:none;
-    width:100%;
-    font-family:monospace;
+.input input{
+  flex:1;
+  background:black;
+  border:none;
+  color:#00ff00;
+  outline:none;
 }
 
-.app-window{
-    position:absolute;
-    top:120px;
-    left:180px;
-    width:900px;
-    height:600px;
-    background:white;
-    display:none;
-    border:1px solid #444;
+.app{
+  position:absolute;
+  top:100px;
+  left:200px;
+  width:900px;
+  height:600px;
+  background:white;
+  display:none;
 }
 
-.app-content{
-    height:calc(100% - 35px);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:32px;
+.app iframe{
+  width:100%;
+  height:100%;
+  border:none;
 }
 </style>
 </head>
@@ -116,296 +102,212 @@ body{
 <body>
 
 <div id="desktop">
-
-    <div class="icon" onclick="openTerminal()">
-        💻
-        <div>Terminal</div>
-    </div>
-
-    <div id="apps"></div>
-
+  <div class="icon" onclick="openTerminal()">💻 Terminal</div>
+  <div id="apps"></div>
 </div>
 
-<!-- TERMINAL -->
-
-<div class="window" id="terminalWindow">
-
-    <div class="titlebar">
-        <span>Terminal</span>
-
-        <button class="close-btn"
-                onclick="closeTerminal()">X</button>
-    </div>
-
-    <div id="terminal"></div>
-
+<div class="window" id="terminalWin">
+  <div class="titlebar">
+    Terminal
+    <button class="close" onclick="closeTerminal()">X</button>
+  </div>
+  <div id="terminal"></div>
 </div>
 
-<!-- APP WINDOW -->
-
-<div class="app-window" id="appWindow">
-
-    <div class="titlebar">
-        <span id="appTitle">App</span>
-
-        <button class="close-btn"
-                onclick="closeApp()">X</button>
-    </div>
-
-    <div class="app-content" id="appContent">
-    </div>
-
+<div class="app" id="appWin">
+  <div class="titlebar">
+    <span id="appTitle">App</span>
+    <button class="close" onclick="closeApp()">X</button>
+  </div>
 </div>
 
 <script>
 
-const terminal =
-document.getElementById("terminal");
+const DISK_SIZE = 2048; // 2GB (MB)
 
-const installedPackages = [];
+let state = JSON.parse(localStorage.getItem("webos")) || {
+  installed:{},
+  used:0
+};
+
+const repo = {
+  minecraft:{
+    size:850,
+    path:"/apps/eaglercraft/index.html",
+    icon:"🟩"
+  },
+  doom:{
+    size:35,
+    path:"/apps/doom/index.html",
+    icon:"🔥"
+  }
+};
+
+function save(){
+  localStorage.setItem("webos",JSON.stringify(state));
+}
+
+/* ---------- DESKTOP ---------- */
+
+function renderIcons(){
+  const apps=document.getElementById("apps");
+  apps.innerHTML="";
+
+  Object.keys(state.installed).forEach(p=>{
+    let div=document.createElement("div");
+    div.className="icon";
+    div.innerHTML=repo[p].icon+" "+p;
+    div.onclick=()=>openApp(p);
+    apps.appendChild(div);
+  });
+}
+
+renderIcons();
+
+/* ---------- TERMINAL ---------- */
 
 function openTerminal(){
-    document.getElementById(
-      "terminalWindow"
-    ).style.display="block";
-
-    if(!terminal.innerHTML){
-        printLine("Welcome to WebOS");
-        printLine("Type 'help'");
-        newPrompt();
-    }
+  document.getElementById("terminalWin").style.display="block";
 }
 
 function closeTerminal(){
-    document.getElementById(
-      "terminalWindow"
-    ).style.display="none";
+  document.getElementById("terminalWin").style.display="none";
 }
 
-function printLine(text){
-    terminal.innerHTML += text + "<br>";
-    terminal.scrollTop =
-    terminal.scrollHeight;
+const terminal=document.getElementById("terminal");
+
+function print(t){
+  terminal.innerHTML+=t+"<br>";
+  terminal.scrollTop=terminal.scrollHeight;
 }
 
-function newPrompt(){
+function prompt(){
+  let div=document.createElement("div");
+  div.className="input";
 
-    const line =
-    document.createElement("div");
+  div.innerHTML=`
+    <span>webos$ </span>
+    <input>
+  `;
 
-    line.className = "input-line";
+  terminal.appendChild(div);
 
-    line.innerHTML = `
-    <span>webos@localhost:~$&nbsp;</span>
-    <input autofocus>
-    `;
+  let input=div.querySelector("input");
 
-    terminal.appendChild(line);
+  input.focus();
 
-    const input =
-    line.querySelector("input");
-
-    input.focus();
-
-    input.addEventListener(
-      "keydown",
-      function(e){
-
-        if(e.key==="Enter"){
-
-            const cmd = input.value;
-
-            input.disabled = true;
-
-            execute(cmd);
-
-            newPrompt();
-        }
-
-      }
-    );
-
-    terminal.scrollTop =
-    terminal.scrollHeight;
+  input.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){
+      run(input.value);
+      input.disabled=true;
+      prompt();
+    }
+  });
 }
 
-function execute(cmd){
+function run(cmd){
 
-    if(cmd==="help"){
+  if(cmd==="help"){
+    print("disk | sudo apt update | sudo apt install <pkg> | sudo apt remove <pkg> | minecraft | doom | clear");
+    return;
+  }
 
-        printLine(`
-Commands:<br>
-help<br>
-clear<br>
-sudo apt update<br>
-sudo apt install minecraft<br>
-sudo apt install doom
-`);
+  if(cmd==="clear"){
+    terminal.innerHTML="";
+    return;
+  }
 
-        return;
+  if(cmd==="disk"){
+    print(`Disk 2GB`);
+    print(`Used: ${state.used}MB`);
+    print(`Free: ${DISK_SIZE-state.used}MB`);
+    return;
+  }
+
+  if(cmd==="sudo apt update"){
+    print("Hit: webos-main");
+    print("Hit: webos-games");
+    print("Done.");
+    return;
+  }
+
+  if(cmd.startsWith("sudo apt install")){
+
+    let pkg=cmd.split(" ")[3];
+
+    if(!repo[pkg]){
+      print("Package not found");
+      return;
     }
 
-    if(cmd==="clear"){
-
-        terminal.innerHTML="";
-        return;
+    if(state.used+repo[pkg].size>DISK_SIZE){
+      print("E: No space left on device");
+      return;
     }
 
-    if(cmd==="sudo apt update"){
+    state.installed[pkg]=true;
+    state.used+=repo[pkg].size;
+    save();
+    renderIcons();
 
-        printLine(
-        "Hit:1 webos-main"
-        );
+    print("Installing "+pkg+"...");
+    print("Done.");
+    return;
+  }
 
-        printLine(
-        "Hit:2 webos-games"
-        );
+  if(cmd.startsWith("sudo apt remove")){
 
-        printLine(
-        "Reading package lists... Done"
-        );
+    let pkg=cmd.split(" ")[3];
 
-        return;
-    }
+    if(!state.installed[pkg]) return;
 
-    if(cmd==="sudo apt install minecraft"){
+    state.used-=repo[pkg].size;
+    delete state.installed[pkg];
 
-        installPackage(
-        "minecraft",
-        "🟩"
-        );
+    save();
+    renderIcons();
 
-        return;
-    }
+    print("Removed "+pkg);
+    return;
+  }
 
-    if(cmd==="sudo apt install doom"){
+  if(cmd==="minecraft"){
+    openApp("minecraft");
+    return;
+  }
 
-        installPackage(
-        "doom",
-        "🔥"
-        );
+  if(cmd==="doom"){
+    openApp("doom");
+    return;
+  }
 
-        return;
-    }
-
-    if(cmd==="minecraft"){
-
-        launchApp(
-        "Minecraft",
-        "Minecraft Clone (Eaglercraft)"
-        );
-
-        return;
-    }
-
-    if(cmd==="doom"){
-
-        launchApp(
-        "DOOM",
-        "DOOM HTML5"
-        );
-
-        return;
-    }
-
-    printLine(
-    cmd + ": command not found"
-    );
+  print("command not found");
 }
 
-function installPackage(name, icon){
+prompt();
 
-    if(installedPackages.includes(name)){
+/* ---------- APPS ---------- */
 
-        printLine(
-        name + " already installed"
-        );
+function openApp(name){
 
-        return;
-    }
+  let app=document.getElementById("appWin");
 
-    installedPackages.push(name);
+  document.getElementById("appTitle").innerText=name;
 
-    printLine(
-    "Installing " + name + "..."
-    );
+  app.style.display="block";
 
-    printLine(
-    "Done."
-    );
+  app.innerHTML=`
+    <div class="titlebar">
+      ${name}
+      <button class="close" onclick="closeApp()">X</button>
+    </div>
 
-    createDesktopIcon(
-    name,
-    icon
-    );
-}
-
-function createDesktopIcon(
-name,
-icon
-){
-
-    const apps =
-    document.getElementById("apps");
-
-    const div =
-    document.createElement("div");
-
-    div.className="icon";
-
-    div.innerHTML=`
-        ${icon}
-        <div>${name}</div>
-    `;
-
-    div.onclick=
-    ()=>launchInstalled(name);
-
-    apps.appendChild(div);
-}
-
-function launchInstalled(name){
-
-    if(name==="minecraft"){
-
-        launchApp(
-        "Minecraft",
-        "Minecraft Clone (Eaglercraft)"
-        );
-    }
-
-    if(name==="doom"){
-
-        launchApp(
-        "DOOM",
-        "DOOM HTML5"
-        );
-    }
-}
-
-function launchApp(
-title,
-content
-){
-
-    document.getElementById(
-    "appTitle"
-    ).textContent=title;
-
-    document.getElementById(
-    "appContent"
-    ).innerHTML=content;
-
-    document.getElementById(
-    "appWindow"
-    ).style.display="block";
+    <iframe src="${repo[name].path}"></iframe>
+  `;
 }
 
 function closeApp(){
-
-    document.getElementById(
-    "appWindow"
-    ).style.display="none";
+  document.getElementById("appWin").style.display="none";
 }
 
 </script>
